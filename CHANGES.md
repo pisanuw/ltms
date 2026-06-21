@@ -14,3 +14,5 @@ Format: `YYYY-MM-DD [type] description` (max 200 chars). Types: decision, plan, 
 2026-06-20 [decision] Critical-path to working LTMS+engine = sessions 0->1->3->4->5; JTMS(2), hardening(7), CLTMS(8) are value-adds. Core invariants documented (FAIL!=empty, pvs discipline, deferred contradictions, two-phase retraction, handler stack).
 
 2026-06-20 [code] Session 0 done: project scaffold (pyproject hatchling, MIT LICENSE, NOTICE w/ BPS attribution, README, GitHub Actions CI), src/ltms terms.py + unify.py (occurs-check, FAIL sentinel, substitute), 24 tests + Hypothesis props; ruff+mypy(strict) clean.
+
+2026-06-20 [code] Session 1 done: TRE pattern-directed forward-chainer (src/ltms/tre): car-indexed dbclass, assert_/fetch, rule bodies as Python callables, nested (conjunctive) rules via closures, LIFO run_rules. 10 tests (transitive closure, order-independence, bounded recursion, dedup). ruff ignores UP005.

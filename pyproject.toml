@@ -40,6 +40,9 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
+# UP005 only ever false-positives here: our Tre.assert_ is a domain method
+# (BPS's assert!), not a deprecated unittest.TestCase assertion alias.
+ignore = ["UP005"]
 
 [tool.mypy]
 python_version = "3.10"
