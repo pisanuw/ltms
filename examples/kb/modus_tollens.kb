@@ -1,0 +1,5 @@
+# Modus tollens: from p -> q and not-q, conclude not-p.
+p -> q
+~ q
+expect q false
+expect p false

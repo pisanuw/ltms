@@ -1,0 +1,12 @@
+# Universal rules + facts: ancestor as the transitive closure of parent.
+rule (parent ?x ?y) => (ancestor ?x ?y)
+rule (parent ?x ?y) & (ancestor ?y ?z) => (ancestor ?x ?z)
+rule (parent ?x ?y) & (parent ?y ?z) => (grandparent ?x ?z)
+
+parent ann bob
+parent bob cy
+parent cy dee
+
+expect ancestor ann dee true
+expect grandparent ann cy true
+expect ancestor ann bob true

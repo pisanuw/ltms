@@ -30,7 +30,10 @@ tested, idiomatic-Python implementation.
 | LTMS core | `ltms.core`, `ltms.normalize` | clausal Boolean Constraint Propagation, assumptions, nogoods, CNF |
 | LTRE | `ltms.ltre` | reasoning engine: `assert!`/`assume!`/`retract!`, belief-conditioned rules |
 | Facilities | `ltms.indirect`, `ltms.cwa`, `ltms.dds` | indirect proof, closed-world assumptions, dependency-directed search |
+| Completeness | `ltms.cltms` | prime implicates / `complete()` (optional logical completeness) |
+| Watched literals | `ltms.watched` | `WatchedLTMS`, the SAT-style 2-watched-literals BCP engine |
 | Explanation | `ltms.explain` | `why_node`, `explain_node` (well-founded proofs) |
+| File DSL | `ltms.dsl` | read world models from `.kb` files, separate from Python |
 
 ## Usage
 
@@ -49,7 +52,26 @@ e.retract(("rain",), "guess")
 e.is_unknown(("wet",))              # True  (belief revised)
 ```
 
-See [examples/](examples/) for runnable TRE, LTRE, and dependency-directed-search demos.
+### World models in files
+
+The world model can live in a `.kb` data file, separate from Python:
+
+```
+# examples/kb/belief_revision.kb
+rain         -> wet ground
+sprinkler on -> wet ground
+assume rain
+expect wet ground true
+```
+
+```python
+from ltms.dsl import load_kb_file
+load_kb_file("examples/kb/belief_revision.kb")   # runs it; `expect` lines self-check
+```
+
+See [examples/](examples/) for runnable TRE, LTRE, and dependency-directed-search
+demos, and [exercises/](exercises/) for worked solutions to the book's
+chapter exercises (paraphrased statements + original answers/code).
 
 ## Install (development)
 

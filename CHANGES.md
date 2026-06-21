@@ -37,3 +37,11 @@ Format: `YYYY-MM-DD [type] description` (max 200 chars). Types: decision, plan, 
 2026-06-21 [code] Added watched-literals engine (ltms/watched.py): WatchedLTMS, 2-watched-literals BCP (no per-clause counters), support-pointer two-phase retraction. Validated by differential tests: identical forced labels + contradictions vs counter LTMS over random CNF+assumptions (300 ex), and sound vs PySAT Minisat22 (200 ex). Reference LTMS stays default; rule engine/CWA/DDS run on it.
 
 2026-06-21 [doc] Started exercises/ (per-chapter book exercise solutions, paraphrased + original). ch09 (LTMS) and ch10 (LTRE) hand-written with runnable solutions.py: clause-count blow-up, taxonomy CNF size, BCP completeness via complete(); XOR, one-step abduction (NEEDS), and N-queens via dd_search (counts 4->2,5->10,6->4). tests/test_exercises.py runs every solutions.py.
+
+2026-06-21 [doc] exercises/ch16 (Assumption-Based Constraint Languages): analysis-only README (no code; ATCON/TCON not in package). Ex1 atcon-delay t/nil tradeoff (savings vs check overhead, cheap-deterministic vs expensive-feedback); Ex2 explicit nogood DB exponential->poly via small-core/large-tail.
+
+2026-06-21 [doc] Wrote exercises/ch14/README.md: analysis-only answers for all 16 ch14 (Putting the ATMS to Work) exercises; ATMS/ATRE out of scope so no code, design/complexity sketches only.
+
+2026-06-21 [doc] exercises/ch17 (TGDE / A Tiny Diagnosis Engine) analysis-only README: all 10 exercises paraphrased + answered (lattice size 2^n, min-card => min, single-valued predictions, direct min-hitting-set diagnosis, prob-threshold smallest-diagnoses, hierarchical OK assumptions, horizon effect, prob misdiagnosis, CLTMS complete diagnoser on polybox, best-input active diagnosis). No code; out of scope.
+
+2026-06-21 [doc] Completed exercises/ for ALL 16 chapters (3-18): paraphrased problem statements + original answers. Code chapters (4,6,7,8,9,10,13) ship runnable solutions.py (verified, run in CI via test_exercises.py); analysis chapters (3,5,11,12,14,15,16,17,18) give conceptual answers (systems out of scope). exercises/README.md index. Drafted via background workflow (wf_804932f3-27e, 14 agents); ch9/ch10/ch18 + index hand-finished. Added examples/kb/{modus_tollens,diagnosis,family}.kb. README updated (DSL, WatchedLTMS, exercises).

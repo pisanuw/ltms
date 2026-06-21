@@ -1,0 +1,6 @@
+# A simple diagnosis: a lamp is off because the bulb is dead or there is no power.
+# Observing that power is fine narrows it to the dead bulb.
+lamp off -> bulb dead | no power
+lamp off
+~ no power
+expect bulb dead true
