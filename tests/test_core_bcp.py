@@ -59,6 +59,19 @@ def test_bcp_is_incomplete_leaves_entailed_literal_unknown():
     assert y.label is Label.UNKNOWN
 
 
+def test_bcp_is_refutation_incomplete():
+    # {~x~y, ~xy, x~y, xy} is UNSAT, but unit propagation cannot detect it:
+    # every clause keeps 2 potential violators, so nothing is ever forced.
+    m = LTMS()
+    x, y = m.create_node("x"), m.create_node("y")
+    m.add_clause([], [x, y], "~x v ~y")
+    m.add_clause([y], [x], "~x v y")
+    m.add_clause([x], [y], "x v ~y")
+    m.add_clause([x, y], [], "x v y")
+    # No contradiction raised, all labels unknown -- expected (sound, not complete).
+    assert x.label is Label.UNKNOWN and y.label is Label.UNKNOWN
+
+
 def test_tautology_is_dropped():
     m = LTMS()
     x = m.create_node("x")

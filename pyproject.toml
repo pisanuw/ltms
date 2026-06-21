@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ltms"
-version = "0.0.0"
+version = "0.1.0"
 description = "A logic-based Truth Maintenance System and pattern-directed reasoning engine in Python, after Forbus & de Kleer, Building Problem Solvers."
 readme = "README.md"
 requires-python = ">=3.10"

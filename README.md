@@ -10,8 +10,8 @@ every derived value, performs **dependency-directed backtracking** on
 contradictions, and can **explain** why anything is believed. A small
 forward-chaining rule engine sits on top of it.
 
-> Status: **under construction.** See [PLAN.md](PLAN.md) for the multi-session
-> build plan and [STUDY-NOTES.md](STUDY-NOTES.md) for the technical digest.
+> See [PLAN.md](PLAN.md) for the multi-session build plan and
+> [STUDY-NOTES.md](STUDY-NOTES.md) for the technical digest.
 
 ## Why
 
@@ -20,19 +20,51 @@ but the clausal-BCP LTMS with dependency-directed backtracking is the
 least-ported truth maintenance system outside Lisp/Racket. This is a clean,
 tested, idiomatic-Python implementation.
 
-## Layers (built bottom-up)
+## What's here
 
+| Layer | Module | What it gives you |
+|---|---|---|
+| Terms + unification | `ltms.terms`, `ltms.unify` | s-expression terms, occurs-checked unification |
+| TRE | `ltms.tre` | pattern-directed forward chaining (no belief revision) |
+| JTMS + JTRE | `ltms.jtms`, `ltms.jtre` | justification-based belief, IN/OUT, two-phase retraction |
+| LTMS core | `ltms.core`, `ltms.normalize` | clausal Boolean Constraint Propagation, assumptions, nogoods, CNF |
+| LTRE | `ltms.ltre` | reasoning engine: `assert!`/`assume!`/`retract!`, belief-conditioned rules |
+| Facilities | `ltms.indirect`, `ltms.cwa`, `ltms.dds` | indirect proof, closed-world assumptions, dependency-directed search |
+| Explanation | `ltms.explain` | `why_node`, `explain_node` (well-founded proofs) |
+
+## Usage
+
+```python
+from ltms import LTRE
+
+e = LTRE()
+e.assert_(("or", ("p",), ("q",)))   # p v q
+e.assert_(("not", ("p",)))          # ~p
+e.is_true(("q",))                   # True  (unit propagation)
+
+e.assume(("rain",), "guess")        # retractable assumption
+e.assert_(("implies", ("rain",), ("wet",)))
+e.is_true(("wet",))                 # True
+e.retract(("rain",), "guess")
+e.is_unknown(("wet",))              # True  (belief revised)
 ```
-terms + unify  →  TRE  →  [JTMS]  →  LTMS core (BCP)  →  LTRE  →  indirect / CWA / DDS  →  [CLTMS]
-```
+
+See [examples/](examples/) for runnable TRE, LTRE, and dependency-directed-search demos.
 
 ## Install (development)
 
 ```bash
 python -m venv .venv && . .venv/bin/activate
-pip install -e ".[dev]"
+pip install -e ".[dev]"      # add ".[dev,sat]" for the PySAT differential tests
 pytest
 ```
+
+## Notes
+
+BCP uses the book's incremental `pvs`/`sats` counters (sound but, by design,
+not logically complete). A watched-literals rewrite and the completeness
+extension (CLTMS, prime implicates) are tracked as future work in
+[PLAN.md](PLAN.md).
 
 ## Provenance & licensing
 
