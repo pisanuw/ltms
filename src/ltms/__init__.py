@@ -46,6 +46,7 @@ from .terms import (
 )
 from .tre import Tre
 from .unify import FAIL, substitute, unify
+from .watched import WatchedLTMS
 
 __all__ = [
     # terms & unification
@@ -56,7 +57,7 @@ __all__ = [
     # JTMS / JTRE
     "JTMS", "Justification", "JTMSContradiction", "JTre",
     # LTMS core
-    "LTMS", "TmsNode", "Clause", "Label", "ENABLED_ASSUMPTION",
+    "LTMS", "WatchedLTMS", "TmsNode", "Clause", "Label", "ENABLED_ASSUMPTION",
     "LTMSContradiction", "avoid_all",
     # CNF + LTRE + facilities
     "normalize", "add_formula", "LTRE", "Datum", "Trigger",
