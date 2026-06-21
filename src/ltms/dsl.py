@@ -19,6 +19,8 @@ Statements (the leading keyword is the directive; a bare line is an assertion)::
     contradiction a, b            # a and b cannot both hold
     rule (human ?x) => (mortal ?x)            # universal forward rule
     rule (parent ?x ?y) & (parent ?y ?z) => (grandparent ?x ?z)
+    taxonomy red, green, blue     # exactly one of them holds
+    complete                      # add prime implicates (make BCP complete)
     query wet ground              # record its belief (true/false/unknown)
     expect wet ground true        # like query, but fails if it is not 'true'
 
@@ -176,6 +178,7 @@ def _flatten_and(expr: Term) -> list[Term]:
 class KBResult:
     queries: list[tuple[str, str]] = field(default_factory=list)
     engine: LTRE | None = None
+    clauses_added: int = 0  # prime implicates added by `complete` directives
 
 
 def _status(engine: LTRE, expr: Term) -> str:
@@ -230,6 +233,15 @@ def load_kb(text: str, engine: LTRE | None = None) -> KBResult:
                 raise ValueError(f"rule needs '=>': {line!r}")
             antecedents = _flatten_and(parse_expr(lhs))
             _install_rule(engine, antecedents, parse_expr(rhs))
+            engine.run_rules()
+        elif head == "taxonomy":
+            options = [parse_expr(part) for part in _split_top(rest)]
+            engine.assert_(("taxonomy", *options))  # exactly one of them holds
+            engine.run_rules()
+        elif head == "complete":
+            from .cltms import complete
+
+            result.clauses_added += complete(engine.ltms)
             engine.run_rules()
         elif head == "query":
             expr = parse_expr(rest)

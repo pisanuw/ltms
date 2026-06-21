@@ -1,0 +1,11 @@
+# Ch10: two independent supports for a conclusion; retracting one leaves it
+# believed via the other, retracting both withdraws it.
+rain         -> wet ground
+sprinkler on -> wet ground
+assume rain
+expect wet ground true
+assume sprinkler on
+retract rain
+expect wet ground true
+retract sprinkler on
+expect wet ground unknown

@@ -1,0 +1,8 @@
+# Ch4 (TRE): forward rules computing ancestor as the transitive closure of parent.
+rule (parent ?x ?y) => (ancestor ?x ?y)
+rule (parent ?x ?y) & (ancestor ?y ?z) => (ancestor ?x ?z)
+parent ann bob
+parent bob cy
+parent cy dee
+expect ancestor ann dee true
+expect ancestor bob dee true

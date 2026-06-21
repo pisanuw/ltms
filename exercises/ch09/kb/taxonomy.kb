@@ -1,0 +1,7 @@
+# Ch9 (Ex 4 context): a TAXONOMY says exactly one mode holds. Asserting one mode
+# forces the others false (the pairwise "not both" clauses fire).
+taxonomy mode ok, mode stuck open, mode stuck closed
+assume mode ok
+expect mode ok true
+expect mode stuck open false
+expect mode stuck closed false

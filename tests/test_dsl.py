@@ -87,6 +87,30 @@ def test_kb_conjunctive_rule():
     load_kb(kb)
 
 
+def test_kb_taxonomy_directive():
+    kb = """
+    taxonomy red, green, blue
+    assume red
+    expect red true
+    expect green false
+    expect blue false
+    """
+    load_kb(kb)
+
+
+def test_kb_complete_directive():
+    # {x v ~y, x v y} entails x; BCP misses it until `complete` adds implicates.
+    kb = """
+    x | ~ y
+    x | y
+    expect x unknown
+    complete
+    expect x true
+    """
+    result = load_kb(kb)
+    assert result.clauses_added >= 1
+
+
 def test_expect_failure_raises():
     with pytest.raises(AssertionError, match="expect failed"):
         load_kb("rain\nexpect rain false\n")

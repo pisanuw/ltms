@@ -1,0 +1,8 @@
+# Ch10: an implication chain under an assumption; retracting the assumption
+# withdraws the whole chain.
+p -> q
+q -> r
+assume p
+expect r true
+retract p
+expect r unknown

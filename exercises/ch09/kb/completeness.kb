@@ -1,0 +1,7 @@
+# Ch9 (Ex 5): once the prime implicates are added, BCP is complete and the
+# entailed literal x is forced in one step.
+x | ~ y
+x | y
+expect x unknown
+complete
+expect x true

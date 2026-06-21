@@ -1,0 +1,6 @@
+# Exactly one of a mutually-exclusive set holds.
+taxonomy red, green, blue
+assume green
+expect green true
+expect red false
+expect blue false

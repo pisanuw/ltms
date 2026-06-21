@@ -24,8 +24,9 @@ def test_family_tre_example():
 
 
 def test_belief_revision_example():
-    result = _load("belief_revision_ltre.py").main()
-    assert result["wet_after_both_retracted"] is True
+    result = _load("belief_revision_ltre.py").main()  # loads kb/belief_revision.kb
+    assert result.engine is not None
+    assert result.engine.is_unknown(("wet", "ground"))  # both supports retracted
 
 
 def test_coloring_dds_example():

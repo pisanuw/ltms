@@ -1,0 +1,6 @@
+# Ch9: BCP is sound but not complete. {x v ~y, x v y} entails x, yet plain unit
+# propagation forces nothing -- both literals stay unknown.
+x | ~ y
+x | y
+expect x unknown
+expect y unknown

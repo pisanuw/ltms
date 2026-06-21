@@ -1,0 +1,6 @@
+# Ch10 (Ex 2): exclusive-or written via its definition (p v q) & ~(p & q).
+# Asserting one disjunct forces the other false.
+(p | q) & ~ (p & q)
+assume p
+expect p true
+expect q false

@@ -1,0 +1,7 @@
+# Ch6 (intro to TMS): a derived fact is believed only while its premises are.
+battery ok & bulb ok -> lamp lights
+assume battery ok
+assume bulb ok
+expect lamp lights true
+retract bulb ok
+expect lamp lights unknown

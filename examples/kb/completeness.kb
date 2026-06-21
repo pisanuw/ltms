@@ -1,0 +1,7 @@
+# Plain BCP is incomplete: {x v ~y, x v y} entails x but unit propagation
+# cannot derive it. Adding the prime implicates (complete) makes it derivable.
+x | ~ y
+x | y
+expect x unknown
+complete
+expect x true

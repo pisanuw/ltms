@@ -1,0 +1,8 @@
+# Ch13: {a->c, b->c, a v b} entails c by cases. Plain BCP misses it; completion
+# derives the prime implicate c.
+a -> c
+b -> c
+a | b
+expect c unknown
+complete
+expect c true

@@ -1,0 +1,6 @@
+# Ch9 (Ex 1 context): a 3-literal clause is one constraint that propagates in
+# every direction. With two literals known false, the third is forced.
+a | b | c
+~ a
+~ b
+expect c true

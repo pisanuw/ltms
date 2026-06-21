@@ -34,6 +34,13 @@ are original. The book's difficulty stars (★ … ★★★★) are kept as a g
 | [ch17](ch17/) | A Tiny Diagnosis Engine (TGDE) | analysis |
 | [ch18](ch18/) | Symbolic Relaxation Systems | analysis |
 
+**World models as data files.** Where an exercise is a declarative
+propositional model, it is also expressed as a `.kb` file under
+`chNN/kb/` (e.g. [ch09/kb/](ch09/kb/), [ch10/kb/](ch10/kb/)) — the model lives
+in the file, not in Python. These are self-checking (`expect` lines) and run by
+`pytest tests/test_kb_files.py`; load any of them with
+`python examples/run_kb.py <file.kb>`.
+
 Run every code chapter's solutions:
 
 ```bash
