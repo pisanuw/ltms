@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ltms"
+version = "0.0.0"
+description = "A logic-based Truth Maintenance System and pattern-directed reasoning engine in Python, after Forbus & de Kleer, Building Problem Solvers."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "pisanuw" }]
+keywords = ["truth-maintenance", "tms", "ltms", "jtms", "reasoning", "bcp", "inference"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "hypothesis>=6", "ruff>=0.6", "mypy>=1.10"]
+sat = ["python-sat>=1.8"]
+
+[project.urls]
+Homepage = "https://github.com/pisanuw/ltms"
+Repository = "https://github.com/pisanuw/ltms"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ltms"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src"]
+strict = true
+warn_unused_ignores = true

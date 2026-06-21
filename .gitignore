@@ -1,0 +1,20 @@
+# Reference material — copyrighted (book text is MIT Press); kept local only.
+# The book PDF is freely downloadable from qrg.northwestern.edu/BPS with MIT
+# Press's permission, but we do not redistribute it here.
+refs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+.coverage
+htmlcov/

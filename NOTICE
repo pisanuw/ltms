@@ -1,0 +1,30 @@
+ltms — a Python logic-based Truth Maintenance System and reasoning engine
+Copyright (c) 2026 pisanuw. Licensed under the MIT License (see LICENSE).
+
+------------------------------------------------------------------------------
+Attribution / provenance
+------------------------------------------------------------------------------
+
+This project is an independent, clean-room Python reimplementation of the
+algorithms and architecture described in:
+
+    Kenneth D. Forbus and Johan de Kleer,
+    "Building Problem Solvers", MIT Press, 1993.
+
+The original reference implementation is in Common Lisp:
+
+    Copyright (c) 1986-1993 Kenneth D. Forbus, Johan de Kleer and
+    Xerox Corporation. All Rights Reserved.
+
+The Building Problem Solvers reference code is distributed by the authors under
+a permissive notice that allows use, reproduction, and the preparation of
+derivative works provided the original copyright notice accompanies such works.
+This Python project is an independent reimplementation informed by those
+algorithms; it does not copy the original source code. The original code and the
+book are available from the Northwestern Qualitative Reasoning Group:
+
+    https://www.qrg.northwestern.edu/BPS/readme.html
+
+The book's full text PDF is made available there for free download "thanks to
+the gracious permission of MIT Press"; MIT Press retains the print rights. The
+book text and PDF are NOT redistributed in this repository.
