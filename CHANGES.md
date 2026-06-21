@@ -35,3 +35,5 @@ Format: `YYYY-MM-DD [type] description` (max 200 chars). Types: decision, plan, 
 2026-06-21 [code] Added file DSL (ltms/dsl.py): lisp-like .kb format for world models, separate from Python. Statements: assert (bare), assume/retract, contradiction, rule (=> with & antecedents), query, expect (self-checking). parse_expr/load_kb/load_kb_file. examples/kb/belief_revision.kb + run_kb.py runner. 14 tests.
 
 2026-06-21 [code] Added watched-literals engine (ltms/watched.py): WatchedLTMS, 2-watched-literals BCP (no per-clause counters), support-pointer two-phase retraction. Validated by differential tests: identical forced labels + contradictions vs counter LTMS over random CNF+assumptions (300 ex), and sound vs PySAT Minisat22 (200 ex). Reference LTMS stays default; rule engine/CWA/DDS run on it.
+
+2026-06-21 [doc] Started exercises/ (per-chapter book exercise solutions, paraphrased + original). ch09 (LTMS) and ch10 (LTRE) hand-written with runnable solutions.py: clause-count blow-up, taxonomy CNF size, BCP completeness via complete(); XOR, one-step abduction (NEEDS), and N-queens via dd_search (counts 4->2,5->10,6->4). tests/test_exercises.py runs every solutions.py.
