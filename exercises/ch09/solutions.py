@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from math import comb, prod
 
-from ltms.core import LTMS, Label, LTMSContradiction
 from ltms.cltms import complete
+from ltms.core import LTMS, Label, LTMSContradiction
 from ltms.normalize import normalize
 
 
