@@ -22,3 +22,5 @@ Format: `YYYY-MM-DD [type] description` (max 200 chars). Types: decision, plan, 
 2026-06-20 [code] Session 3 done: LTMS BCP core (ltms/core.py: Label TRUE/FALSE/UNKNOWN, TmsNode, Clause w/ pvs+sats counters, add_clause, set_truth, forward unit propagation, simplify/tautology/dup, deferred contradiction detect + handler stack). 10 tests incl. BCP-incompleteness case, well-founded support, deferred dispatch.
 
 2026-06-20 [code] Session 4 done: LTMS assumptions+retraction (enable/retract, two-phase propagate_unknownness + alt-support, clause_consequent), contradiction resolution (with_contradiction_handler stack, add_nogood, avoid_all), CNF normalize.py (and/or/not/implies/iff/taxonomy, add_formula), explain.py (why_node/explain_node/assumptions_of_node). 17 tests; ruff+mypy clean (88 total).
+
+2026-06-20 [code] Session 5 done: LTRE reasoning engine (ltms/ltre.py): Datum<->Node bridge, build_tms_formula (direct translation), assert!/assume!/retract! (incl. guarded compound assumptions), INTERN/TRUE/FALSE rules parked + enqueue bridge, queries with negation inversion, contradiction(). 13 tests; 91 total green.
