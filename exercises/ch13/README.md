@@ -205,5 +205,5 @@ Answer (proof + procedure):
 Run the demonstrations:
 
 ```bash
-cd /Users/pisan/bitbucket/pisanuw/ltms && . .venv/bin/activate && python exercises/ch13/solutions.py
+. .venv/bin/activate && python exercises/ch13/solutions.py
 ```

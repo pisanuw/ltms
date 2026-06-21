@@ -9,7 +9,7 @@ function below corresponds to one exercise and returns a small labeled result;
 ``solve()`` collects them all into one dict.
 
 Run:
-    cd /Users/pisan/bitbucket/pisanuw/ltms
+    # from the repository root
     . .venv/bin/activate
     python exercises/ch04/solutions.py
 

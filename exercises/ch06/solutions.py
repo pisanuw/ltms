@@ -10,7 +10,7 @@ Exercise 2 (**) -- the simplest justification-only TMS (a tiny self-contained
 
 Run::
 
-    cd /Users/pisan/bitbucket/pisanuw/ltms
+    # from the repository root
     . .venv/bin/activate
     python exercises/ch06/solutions.py
 """

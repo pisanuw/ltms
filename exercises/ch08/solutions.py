@@ -10,7 +10,7 @@ so the JSAINT-specific exercises (6-16) are answered in prose in README.md.
 Only the public API listed in the assignment is used.
 
 Run:
-    cd /Users/pisan/bitbucket/pisanuw/ltms
+    # from the repository root
     . .venv/bin/activate
     python exercises/ch08/solutions.py
 """

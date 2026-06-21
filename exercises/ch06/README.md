@@ -150,7 +150,7 @@ the `ltms` package provides.
 ## Running
 
 ```bash
-cd /Users/pisan/bitbucket/pisanuw/ltms
+# from the repository root
 . .venv/bin/activate
 python exercises/ch06/solutions.py
 ```

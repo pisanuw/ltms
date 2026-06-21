@@ -19,7 +19,7 @@ answer. Difficulty stars from the source are noted as (\*).
 Run the demonstrations:
 
 ```
-cd /Users/pisan/bitbucket/pisanuw/ltms
+# from the repository root
 . .venv/bin/activate
 python exercises/ch08/solutions.py
 ```

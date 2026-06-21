@@ -13,7 +13,7 @@ below point at that code.
 Run the demos:
 
 ```
-cd /Users/pisan/bitbucket/pisanuw/ltms
+# from the repository root
 . .venv/bin/activate
 python exercises/ch07/solutions.py
 ```

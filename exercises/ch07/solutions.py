@@ -9,7 +9,7 @@ the real ltms JTMS, using only the documented public API.
 
 Run::
 
-    cd /Users/pisan/bitbucket/pisanuw/ltms
+    # from the repository root
     . .venv/bin/activate
     python exercises/ch07/solutions.py
 """

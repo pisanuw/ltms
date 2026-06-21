@@ -14,7 +14,7 @@ code]**.
 Run the demonstrations:
 
 ```bash
-cd /Users/pisan/bitbucket/pisanuw/ltms
+# from the repository root
 . .venv/bin/activate
 python exercises/ch04/solutions.py
 ```
