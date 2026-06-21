@@ -18,3 +18,5 @@ Format: `YYYY-MM-DD [type] description` (max 200 chars). Types: decision, plan, 
 2026-06-20 [code] Session 1 done: TRE pattern-directed forward-chainer (src/ltms/tre): car-indexed dbclass, assert_/fetch, rule bodies as Python callables, nested (conjunctive) rules via closures, LIFO run_rules. 10 tests (transitive closure, order-independence, bounded recursion, dedup). ruff ignores UP005.
 
 2026-06-20 [code] Session 2 done: JTMS core (ltms/jtms.py: Node IN/OUT, Justification, justify_node, enable/retract with strict two-phase relabel, assumptions_of_node, contradiction handler) + JTRE (ltms/jtre.py: Datum<->Node bridge, dbclass index, INTERN/IN/OUT rules parked + enqueue bridge). 17 tests incl. DDB + circular-support guard.
+
+2026-06-20 [code] Session 3 done: LTMS BCP core (ltms/core.py: Label TRUE/FALSE/UNKNOWN, TmsNode, Clause w/ pvs+sats counters, add_clause, set_truth, forward unit propagation, simplify/tautology/dup, deferred contradiction detect + handler stack). 10 tests incl. BCP-incompleteness case, well-founded support, deferred dispatch.
