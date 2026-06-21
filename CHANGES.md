@@ -51,3 +51,5 @@ Format: `YYYY-MM-DD [type] description` (max 200 chars). Types: decision, plan, 
 2026-06-21 [doc] Scrubbed absolute local paths from tracked files: workflow-generated exercise READMEs/solutions referenced an absolute working directory; replaced with repo-relative paths ("# from the repository root"). 0 occurrences remain in tracked files.
 
 2026-06-21 [doc] Added companion/ — a chapter-by-chapter study companion to the book (index + ch03-ch18). Concepts, worked-example explanations, and exercise-solution walk-throughs, all in our own words (no book text), with runnable "Try it" commands and repo-relative links. Index + flagship ch9/ch10 hand-written; ch3-8,11-18 drafted via background workflow (wf_3363593e-69b, 14 agents) then verified (links resolve, cited commands run, no absolute paths). README links to it.
+
+2026-06-21 [plan] Next task (requested, interrupted before any work): create GitHub Pages under ./docs explaining the project and including the companion (companion/).
