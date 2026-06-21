@@ -343,6 +343,22 @@ class LTMS:
             self.contradiction_handlers.remove(handler)
 
     @contextmanager
+    def with_assumptions(self, pairs: list[tuple[TmsNode, Label]]) -> Iterator[None]:
+        """Enable assumptions on entry, retract them on exit (exception-safe)."""
+        enabled: list[TmsNode] = []
+        try:
+            for node, value in pairs:
+                self.convert_to_assumption(node)
+                enabled.append(node)  # record before enabling, so finally cleans up
+                self.enable_assumption(node, value)
+            yield
+        finally:
+            for node in enabled:
+                self._retract_assumption(node)
+            self._run_bcp()
+            self.check_for_contradictions()
+
+    @contextmanager
     def without_contradiction_check(self) -> Iterator[None]:
         """Temporarily suspend contradiction dispatch (parks violations)."""
         prev = self.checking_contradictions
