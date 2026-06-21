@@ -1,0 +1,15 @@
+# Belief revision: two independent causes of wet ground.
+# The whole world model lives here -- no Python needed to describe it.
+
+rain         -> wet ground
+sprinkler on -> wet ground
+
+assume rain
+expect wet ground true        # supported by rain
+
+assume sprinkler on
+retract rain
+expect wet ground true        # sprinkler still supports it
+
+retract sprinkler on
+expect wet ground unknown     # nothing supports it now

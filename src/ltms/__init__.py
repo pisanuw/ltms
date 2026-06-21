@@ -26,6 +26,7 @@ from .core import (
 )
 from .cwa import close_predicate, closed_world
 from .dds import dd_search
+from .dsl import KBResult, load_kb, load_kb_file, parse_expr
 from .explain import explain_node, support_for_node, why_node
 from .indirect import try_indirect_proof
 from .jtms import JTMS, JTMSContradiction, Justification
@@ -62,6 +63,8 @@ __all__ = [
     "try_indirect_proof", "close_predicate", "closed_world", "dd_search",
     # completeness (optional)
     "complete", "consensus", "prime_implicates",
+    # file DSL
+    "load_kb", "load_kb_file", "parse_expr", "KBResult",
     # explanation
     "why_node", "explain_node", "support_for_node",
 ]

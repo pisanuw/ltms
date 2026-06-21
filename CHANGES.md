@@ -31,3 +31,5 @@ Format: `YYYY-MM-DD [type] description` (max 200 chars). Types: decision, plan, 
 
 2026-06-20 [code] Session 8 done (optional): CLTMS completeness (ltms/cltms.py): consensus (resolution), subsumption, prime_implicates (brute-force saturation; IPIA noted as future work), complete() adds missing prime implicates so BCP becomes logically complete. 7 tests (literal-completeness {x v ~y, x v y}->x, 4-clause UNSAT detection). 112 total green.
 2026-06-20 [note] All planned sessions (0-8) complete: 15 src modules, 16 test files (112 tests), 3 examples; ruff+mypy(strict) clean; wheel builds; pushed to github.com/pisanuw/ltms main.
+
+2026-06-21 [code] Added file DSL (ltms/dsl.py): lisp-like .kb format for world models, separate from Python. Statements: assert (bare), assume/retract, contradiction, rule (=> with & antecedents), query, expect (self-checking). parse_expr/load_kb/load_kb_file. examples/kb/belief_revision.kb + run_kb.py runner. 14 tests.
