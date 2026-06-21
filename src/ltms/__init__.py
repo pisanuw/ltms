@@ -14,6 +14,7 @@ Quick start::
 
 from __future__ import annotations
 
+from .cltms import complete, consensus, prime_implicates
 from .core import (
     ENABLED_ASSUMPTION,
     LTMS,
@@ -59,6 +60,8 @@ __all__ = [
     # CNF + LTRE + facilities
     "normalize", "add_formula", "LTRE", "Datum", "Trigger",
     "try_indirect_proof", "close_predicate", "closed_world", "dd_search",
+    # completeness (optional)
+    "complete", "consensus", "prime_implicates",
     # explanation
     "why_node", "explain_node", "support_for_node",
 ]
