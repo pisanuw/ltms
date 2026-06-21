@@ -28,7 +28,8 @@ discarded -- their counters must stay live for correct retraction.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from enum import Enum
 from typing import Any, Union
 
@@ -317,18 +318,185 @@ class LTMS:
             )
             self.violated_clauses = []
             return
-        still = [c for c in self.violated_clauses if c.is_violated]
-        self.violated_clauses = []
-        if still:
-            self._dispatch_contradiction(still)
-
-    def _dispatch_contradiction(self, clauses: list[Clause]) -> None:
-        for handler in reversed(self.contradiction_handlers):  # stack: top first
-            if handler(clauses, self):
+        while True:
+            still = [c for c in self.violated_clauses if c.is_violated]
+            self.violated_clauses = []
+            if not still:
                 return
-        raise LTMSContradiction(clauses)
+            if not self._dispatch_contradiction(still):
+                raise LTMSContradiction(still)
+            self._run_bcp()  # propagate the handler's repairs; may surface more
+
+    def _dispatch_contradiction(self, clauses: list[Clause]) -> bool:
+        # Handlers form a stack (top first); the first to return truthy wins.
+        return any(handler(clauses, self) for handler in reversed(self.contradiction_handlers))
+
+    @contextmanager
+    def with_contradiction_handler(
+        self, handler: ContradictionHandler
+    ) -> Iterator[None]:
+        """Temporarily push a contradiction handler (exception-safe)."""
+        self.contradiction_handlers.append(handler)
+        try:
+            yield
+        finally:
+            self.contradiction_handlers.remove(handler)
+
+    @contextmanager
+    def without_contradiction_check(self) -> Iterator[None]:
+        """Temporarily suspend contradiction dispatch (parks violations)."""
+        prev = self.checking_contradictions
+        self.checking_contradictions = False
+        try:
+            yield
+        finally:
+            self.checking_contradictions = prev
+
+    # -- assumptions & two-phase retraction --------------------------------- #
+
+    def convert_to_assumption(self, node: TmsNode) -> None:
+        node.assumption = True
+
+    def assume(self, node: TmsNode, value: Label) -> None:
+        """Mark ``node`` an assumption and enable it with ``value``."""
+        self.convert_to_assumption(node)
+        self.enable_assumption(node, value)
+
+    def enable_assumption(self, node: TmsNode, value: Label) -> None:
+        if not node.assumption:
+            raise ValueError(f"{self.node_string(node)} is not an assumption")
+        if node.label is Label.UNKNOWN:
+            self.set_truth(node, value, ENABLED_ASSUMPTION)
+            self._run_bcp()
+            self.check_for_contradictions()
+        elif node.label is value:
+            node.support = ENABLED_ASSUMPTION  # override derived support
+        else:
+            raise ValueError(
+                f"cannot enable {self.node_string(node)} as {value.value}: "
+                f"already {node.label.value}"
+            )
+
+    def retract_assumption(self, node: TmsNode) -> None:
+        """Disable an enabled assumption: two-phase relabel, then re-settle."""
+        self._retract_assumption(node)
+        self._run_bcp()
+        self.check_for_contradictions()
+
+    def _retract_assumption(self, node: TmsNode) -> None:
+        if node.is_known and node.support is ENABLED_ASSUMPTION:
+            unknowns = self._propagate_unknownness(node)
+            # Phase 2: queue every clause touching a freed node so BCP can
+            # re-derive it from alternative support.
+            for n in unknowns:
+                self._to_check.extend(n.true_clauses)
+                self._to_check.extend(n.false_clauses)
+
+    def _propagate_unknownness(self, start: TmsNode) -> list[TmsNode]:
+        """Phase 1: unlabel ``start`` and everything it transitively forced."""
+        unknowns: list[TmsNode] = []
+        queue: list[TmsNode] = [start]
+        while queue:
+            node = queue.pop(0)
+            if node.label is Label.UNKNOWN:
+                continue
+            old = node.label
+            node.label = Label.UNKNOWN
+            node.support = None
+            unknowns.append(node)
+            if old is Label.TRUE:
+                sat_clauses, pv_clauses = node.true_clauses, node.false_clauses
+            else:
+                sat_clauses, pv_clauses = node.false_clauses, node.true_clauses
+            for clause in sat_clauses:  # node no longer satisfies these
+                clause.sats -= 1
+            for clause in pv_clauses:  # node becomes a potential violator again
+                clause.pvs += 1
+                if clause.pvs == 2:
+                    conseq = self._clause_consequent(clause)
+                    if conseq is not None and conseq.label is not Label.UNKNOWN:
+                        queue.append(conseq)  # it loses this clause's support
+        return unknowns
+
+    @staticmethod
+    def _clause_consequent(clause: Clause) -> TmsNode | None:
+        for node, _sign in clause.literals:
+            if node.support is clause:
+                return node
+        return None
+
+    # -- explanation / nogoods --------------------------------------------- #
+
+    def assumptions_of_node(self, node: TmsNode) -> list[TmsNode]:
+        """Enabled assumptions underlying ``node``'s well-founded support."""
+        result: list[TmsNode] = []
+        visited: set[int] = set()
+        work: list[TmsNode] = [node]
+        while work:
+            n = work.pop()
+            if id(n) in visited:
+                continue
+            visited.add(id(n))
+            if n.support is ENABLED_ASSUMPTION:
+                result.append(n)
+            elif isinstance(n.support, Clause):
+                for m, _sign in n.support.literals:
+                    if m is not n:  # the clause's other literals are antecedents
+                        work.append(m)
+        return result
+
+    def assumptions_of_clause(self, clause: Clause) -> list[TmsNode]:
+        """Enabled assumptions underlying every literal of ``clause``."""
+        result: list[TmsNode] = []
+        seen: set[int] = set()
+        for n, _sign in clause.literals:
+            for a in self.assumptions_of_node(n):
+                if id(a) not in seen:
+                    seen.add(id(a))
+                    result.append(a)
+        return result
+
+    def add_nogood(
+        self,
+        culprit: TmsNode,
+        sign: Label,
+        assumptions: list[TmsNode],
+        *,
+        internal: bool = True,
+    ) -> Clause | None:
+        """Install the clause that forbids this combination of assumptions."""
+        trues: list[TmsNode] = []
+        falses: list[TmsNode] = []
+        for a in assumptions:
+            value = sign if a is culprit else a.label
+            if value is Label.TRUE:
+                falses.append(a)  # negate a true assumption -> ~a
+            elif value is Label.FALSE:
+                trues.append(a)  # negate a false assumption -> a
+        literals = [(n, Label.TRUE) for n in trues]
+        literals += [(n, Label.FALSE) for n in falses]
+        return self.add_clause_literals(literals, "NOGOOD", internal=internal)
 
     # -- queries ------------------------------------------------------------ #
 
     def label_of(self, node: TmsNode) -> Label:
         return node.label
+
+
+def avoid_all(clauses: list[Clause], ltms: LTMS) -> bool:
+    """A contradiction handler: retract a culprit assumption and add a nogood.
+
+    Returns True if every violated clause was resolved; False if some violated
+    clause has no underlying assumptions to retract (genuinely unsatisfiable).
+    """
+    for clause in clauses:
+        if not clause.is_violated:
+            continue  # an earlier retraction already resolved this one
+        assumptions = ltms.assumptions_of_clause(clause)
+        if not assumptions:
+            return False
+        culprit = assumptions[0]
+        sign = culprit.label  # capture BEFORE retracting (label goes UNKNOWN after)
+        ltms._retract_assumption(culprit)
+        ltms.add_nogood(culprit, sign, assumptions, internal=True)
+    return True
