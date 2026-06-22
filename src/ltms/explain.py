@@ -11,6 +11,11 @@ from __future__ import annotations
 from .core import ENABLED_ASSUMPTION, LTMS, Clause, Label, TmsNode
 
 
+def _antecedents(clause: Clause, node: TmsNode) -> list[TmsNode]:
+    """The other literals' nodes in ``node``'s forcing ``clause``."""
+    return [m for m, _s in clause.literals if m is not node]
+
+
 def support_for_node(node: TmsNode) -> tuple[list[TmsNode], object] | None:
     """Return ``(antecedent_nodes, informant)`` for a derived node.
 
@@ -22,8 +27,7 @@ def support_for_node(node: TmsNode) -> tuple[list[TmsNode], object] | None:
     if node.support is ENABLED_ASSUMPTION:
         return ([], ENABLED_ASSUMPTION)
     if isinstance(node.support, Clause):
-        antecedents = [m for m, _s in node.support.literals if m is not node]
-        return (antecedents, node.support.informant)
+        return (_antecedents(node.support, node), node.support.informant)
     return ([], "premise")
 
 
@@ -43,7 +47,7 @@ def why_node(ltms: LTMS, node: TmsNode) -> str:
     if node.support is ENABLED_ASSUMPTION:
         return f"{_signed(ltms, node)} is an enabled assumption."
     if isinstance(node.support, Clause):
-        antecedents = [m for m, _s in node.support.literals if m is not node]
+        antecedents = _antecedents(node.support, node)
         if not antecedents:
             return f"{_signed(ltms, node)} is a premise ({node.support.informant})."
         ants = ", ".join(_signed(ltms, m) for m in antecedents)
@@ -61,9 +65,8 @@ def explain_node(ltms: LTMS, node: TmsNode) -> list[str]:
             return
         visited.add(id(n))
         if isinstance(n.support, Clause):
-            for m, _s in n.support.literals:
-                if m is not n:
-                    visit(m)
+            for m in _antecedents(n.support, n):
+                visit(m)
         order.append(n)
 
     visit(node)

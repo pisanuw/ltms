@@ -1,6 +1,6 @@
 import pytest
 
-from ltms.dsl import KBResult, load_kb, parse_expr
+from ltms.dsl import KBResult, load_kb, parse_expr, tokenize
 from ltms.terms import Var
 
 
@@ -25,6 +25,14 @@ def test_parse_negation_and_parens():
 
 def test_parse_variables():
     assert parse_expr("human ?x") == ("human", Var("x"))
+
+
+@pytest.mark.parametrize("bad", ["a - b", "x = y", "p < q", "foo <- bar"])
+def test_tokenize_stray_op_char_raises(bad):
+    # A stray '<', '-', or '=' begins no complete operator; the tokenizer must
+    # raise rather than spin forever on it (regression for the word-loop hang).
+    with pytest.raises(ValueError, match="unexpected character"):
+        tokenize(bad)
 
 
 def test_kb_assert_and_query():

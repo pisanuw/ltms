@@ -59,7 +59,7 @@ def unify(a: Term, b: Term, bindings: dict[Var, Term] | None = None) -> dict[Var
         return FAIL
     for xa, xb in zip(a, b, strict=True):
         result = unify(xa, xb, bindings)
-        if isinstance(result, _Fail):
+        if isinstance(result, _Fail):  # mypy narrows result to dict for the assignment below
             return FAIL
         bindings = result
     return bindings

@@ -267,21 +267,17 @@ class LTMS:
         if value is Label.TRUE:
             self._fire_rules(node.true_rules)
             node.true_rules = []
-            for clause in node.true_clauses:  # node now satisfies these
-                clause.sats += 1
-            for clause in node.false_clauses:  # node was a potential violator here
-                clause.pvs -= 1
-                if clause.pvs < 2:
-                    self._to_check.append(clause)
+            sat_clauses, pv_clauses = node.true_clauses, node.false_clauses
         else:  # Label.FALSE
             self._fire_rules(node.false_rules)
             node.false_rules = []
-            for clause in node.false_clauses:
-                clause.sats += 1
-            for clause in node.true_clauses:
-                clause.pvs -= 1
-                if clause.pvs < 2:
-                    self._to_check.append(clause)
+            sat_clauses, pv_clauses = node.false_clauses, node.true_clauses
+        for clause in sat_clauses:  # node now satisfies these
+            clause.sats += 1
+        for clause in pv_clauses:  # node was a potential violator here
+            clause.pvs -= 1
+            if clause.pvs < 2:
+                self._to_check.append(clause)
 
     def _fire_rules(self, rules: list[Any]) -> None:
         if self.enqueue_procedure is not None:

@@ -67,6 +67,11 @@ def tokenize(text: str) -> list[str]:
         j = i
         while j < n and not text[j].isspace() and text[j] not in _OP_START:
             j += 1
+        if j == i:
+            # A char in _OP_START that began no complete multi/single op
+            # (a stray '<', '-', or '='): the word loop cannot advance, so
+            # raise rather than spin forever on malformed input.
+            raise ValueError(f"unexpected character {c!r} at position {i} in: {text!r}")
         tokens.append(text[i:j])
         i = j
     return tokens
@@ -248,11 +253,12 @@ def load_kb(text: str, engine: LTRE | None = None) -> KBResult:
             result.queries.append((rest.strip(), _status(engine, expr)))
         elif head == "expect":
             *expr_words, expected = rest.split()
-            expr = parse_expr(" ".join(expr_words))
+            expr_text = " ".join(expr_words)
+            expr = parse_expr(expr_text)
             actual = _status(engine, expr)
             if actual != expected:
                 raise AssertionError(
-                    f"expect failed: {' '.join(expr_words)} is {actual}, wanted {expected}"
+                    f"expect failed: {expr_text} is {actual}, wanted {expected}"
                 )
             result.queries.append((" ".join(expr_words), actual))
         else:  # bare line: an assertion

@@ -150,8 +150,11 @@ class WatchedLTMS:
             return
         if len(nonfalse) == 1:
             k = nonfalse[0]
-            other = next((j for j in range(len(lits)) if j != k), k)
-            self._set_watches(clause, [k] if k == other else [k, other])
+            if len(lits) == 1:
+                self._set_watches(clause, [k])
+            else:
+                other = next(j for j in range(len(lits)) if j != k)
+                self._set_watches(clause, [k, other])
             n, s = lits[k]
             if n.label is Label.UNKNOWN:  # unit: force the lone non-false literal
                 self._assign(n, s, clause)

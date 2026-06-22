@@ -232,23 +232,26 @@ class JTMS:
                     self._make_node_in(j.consequence, j)
                     q.append(j.consequence)
 
+    def _fire_rules(self, rules: list[Any]) -> list[Any]:
+        """Enqueue any waiting rules; return the cleared list, or leave it
+        untouched when there is no enqueue procedure to fire them."""
+        if self.enqueue_procedure is None:
+            return rules
+        for rule in rules:
+            self.enqueue_procedure(rule)
+        return []
+
     def _make_node_in(self, conseq: Node, reason: Support) -> None:
         conseq.label = Belief.IN
         conseq.support = reason
-        if self.enqueue_procedure is not None:
-            for rule in conseq.in_rules:
-                self.enqueue_procedure(rule)
-            conseq.in_rules = []
+        conseq.in_rules = self._fire_rules(conseq.in_rules)
 
     # -- two-phase retraction ---------------------------------------------- #
 
     def _make_node_out(self, node: Node) -> None:
         node.support = None
         node.label = Belief.OUT
-        if self.enqueue_procedure is not None:
-            for rule in node.out_rules:
-                self.enqueue_procedure(rule)
-            node.out_rules = []
+        node.out_rules = self._fire_rules(node.out_rules)
 
     def _propagate_outness(self, node: Node) -> list[Node]:
         """Phase 1: label OUT every node whose *current support* is via ``node``."""

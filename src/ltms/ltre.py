@@ -177,7 +177,8 @@ class LTRE:
 
     def retract(self, fact: Term, informant: Any = "user") -> None:
         form, _neg = _signed(fact)
-        datum = self.referent(form) if _is_simple(form) else self.referent(fact)
+        key = form if _is_simple(form) else fact
+        datum = self.referent(key)
         if datum is not None and datum.assumption == informant:
             datum.assumption = None
             self.ltms.retract_assumption(datum.tms_node)

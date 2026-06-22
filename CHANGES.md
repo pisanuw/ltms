@@ -55,3 +55,13 @@ Format: `YYYY-MM-DD [type] description` (max 200 chars). Types: decision, plan, 
 2026-06-21 [plan] Next task (requested, interrupted before any work): create GitHub Pages under ./docs explaining the project and including the companion (companion/).
 
 2026-06-21 [doc] Built GitHub Pages site under ./docs (just-the-docs via remote_theme). Moved companion/ -> docs/companion/ (git mv, single source) + added per-page front matter; rewrote 180 out-of-docs links (../src,../exercises,../examples,PLAN/STUDY-NOTES/BRIEFING) to absolute github blob/tree URLs. New pages: index, getting-started, architecture, exercises, examples + _config.yml/Gemfile/.gitignore. Updated README/BRIEFING companion paths. Needs one-time repo setting: Pages -> Deploy from branch -> main -> /docs.
+
+2026-06-21 [code] Committed the docs/ Pages site to main (be78819) and pushed to origin. Code side complete; only the one-time repo Pages setting (Deploy from branch -> main -> /docs) remains, which requires user action in GitHub Settings.
+
+2026-06-21 [note] Ran /code-improve whole-repo sweep (report-only): 4 reviewers + 2 simplifiers + audits. Found 1 real bug, CI build gap, simplification proposals. Report in CODE-IMPROVE-REPORT.md (untracked).
+
+2026-06-21 [code] Fixed dsl.tokenize infinite-loop on stray '<','-','=' (now raises ValueError) + regression test; added CI build job (python -m build, verified wheel+sdist) + build>=1.0 to dev deps. mypy clean, dsl tests pass.
+
+2026-06-21 [note] Set GitHub repo description + 14 topics via gh; user enabled Pages (Deploy from branch -> main -> /docs). Presentation/setup complete.
+
+2026-06-21 [code] Applied 6 code-improve simplifications (core set_truth collapse, jtms _fire_rules, explain _antecedents, watched unit-watch, ltre retract dedup, dsl expr_text); unify is-FAIL skipped (breaks mypy narrowing). 161 tests pass, mypy clean.
