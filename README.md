@@ -1,5 +1,9 @@
 # ltms
 
+[![PyPI](https://img.shields.io/pypi/v/ltms.svg)](https://pypi.org/project/ltms/)
+[![Python versions](https://img.shields.io/pypi/pyversions/ltms.svg)](https://pypi.org/project/ltms/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A logic-based **Truth Maintenance System (LTMS)** and a **pattern-directed
 reasoning engine** in pure Python, after Forbus & de Kleer, *Building Problem
 Solvers* (MIT Press, 1993).

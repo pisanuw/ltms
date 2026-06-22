@@ -65,3 +65,7 @@ Format: `YYYY-MM-DD [type] description` (max 200 chars). Types: decision, plan, 
 2026-06-21 [note] Set GitHub repo description + 14 topics via gh; user enabled Pages (Deploy from branch -> main -> /docs). Presentation/setup complete.
 
 2026-06-21 [code] Applied 6 code-improve simplifications (core set_truth collapse, jtms _fire_rules, explain _antecedents, watched unit-watch, ltre retract dedup, dsl expr_text); unify is-FAIL skipped (breaks mypy narrowing). 161 tests pass, mypy clean.
+
+2026-06-21 [code] Committed above as 8ea0dfe (local, not pushed). Deleted untracked CODE-IMPROVE-REPORT.md.
+
+2026-06-21 [code] Published ltms 0.1.0 to PyPI (pypi.org/project/ltms/0.1.0): wheel+sdist via twine, twine check passed, verified pip-installable from a clean venv. TestPyPI dry-run skipped (separate-account auth). Pending: push main + tag v0.1.0.
