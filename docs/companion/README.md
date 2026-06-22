@@ -1,3 +1,10 @@
+---
+title: Study Companion
+nav_order: 4
+has_children: true
+permalink: /companion/
+---
+
 # A Study Companion to *Building Problem Solvers*
 
 A chapter-by-chapter guide to Forbus & de Kleer's *Building Problem Solvers*
@@ -16,7 +23,7 @@ Each chapter page follows the same shape:
 1. **The big idea** — why the chapter exists and what problem it solves.
 2. **Concepts, step by step** — the data structures and algorithms in plain language.
 3. **The examples, explained** — what each worked example demonstrates.
-4. **Exercises walk-through** — the notable solutions (full set in [`../exercises/`](../exercises/)).
+4. **Exercises walk-through** — the notable solutions (full set in [`../exercises/`](https://github.com/pisanuw/ltms/tree/main/exercises/)).
 5. **Try it in this repo** — runnable commands against our Python code.
 6. **Takeaways**.
 
@@ -54,16 +61,16 @@ search without losing work — the recurring payoff of truth maintenance.
 |---|---|---|---|
 | 1 Preface, 2 Introduction | *(this page)* | — | — |
 | 3 Classical Problem Solving | [ch03](ch03.md) | concept | — |
-| 4 Pattern-Directed Inference (TRE) | [ch04](ch04.md) | ✅ code | [`tre/`](../src/ltms/tre/) |
+| 4 Pattern-Directed Inference (TRE) | [ch04](ch04.md) | ✅ code | [`tre/`](https://github.com/pisanuw/ltms/tree/main/src/ltms/tre/) |
 | 5 Extending PDIS (FTRE) | [ch05](ch05.md) | concept | — |
-| 6 Introduction to TMS | [ch06](ch06.md) | ✅ code | [`jtms.py`](../src/ltms/jtms.py) |
-| 7 Justification-Based TMS | [ch07](ch07.md) | ✅ code | [`jtms.py`](../src/ltms/jtms.py) |
-| 8 Putting the JTMS to Work (JTRE) | [ch08](ch08.md) | ✅ code | [`jtre.py`](../src/ltms/jtre.py) |
-| 9 **Logic-Based TMS (LTMS)** | [ch09](ch09.md) | ✅ code | [`core.py`](../src/ltms/core.py), [`watched.py`](../src/ltms/watched.py) |
-| 10 **Putting an LTMS to Work (LTRE)** | [ch10](ch10.md) | ✅ code | [`ltre.py`](../src/ltms/ltre.py), [`indirect`](../src/ltms/indirect.py)/[`cwa`](../src/ltms/cwa.py)/[`dds`](../src/ltms/dds.py) |
+| 6 Introduction to TMS | [ch06](ch06.md) | ✅ code | [`jtms.py`](https://github.com/pisanuw/ltms/blob/main/src/ltms/jtms.py) |
+| 7 Justification-Based TMS | [ch07](ch07.md) | ✅ code | [`jtms.py`](https://github.com/pisanuw/ltms/blob/main/src/ltms/jtms.py) |
+| 8 Putting the JTMS to Work (JTRE) | [ch08](ch08.md) | ✅ code | [`jtre.py`](https://github.com/pisanuw/ltms/blob/main/src/ltms/jtre.py) |
+| 9 **Logic-Based TMS (LTMS)** | [ch09](ch09.md) | ✅ code | [`core.py`](https://github.com/pisanuw/ltms/blob/main/src/ltms/core.py), [`watched.py`](https://github.com/pisanuw/ltms/blob/main/src/ltms/watched.py) |
+| 10 **Putting an LTMS to Work (LTRE)** | [ch10](ch10.md) | ✅ code | [`ltre.py`](https://github.com/pisanuw/ltms/blob/main/src/ltms/ltre.py), [`indirect`](https://github.com/pisanuw/ltms/blob/main/src/ltms/indirect.py)/[`cwa`](https://github.com/pisanuw/ltms/blob/main/src/ltms/cwa.py)/[`dds`](https://github.com/pisanuw/ltms/blob/main/src/ltms/dds.py) |
 | 11 Qualitative Process Theory | [ch11](ch11.md) | concept | — |
 | 12 Assumption-Based TMS (ATMS) | [ch12](ch12.md) | concept | — |
-| 13 Improving Completeness (CLTMS) | [ch13](ch13.md) | ✅ code | [`cltms.py`](../src/ltms/cltms.py) |
+| 13 Improving Completeness (CLTMS) | [ch13](ch13.md) | ✅ code | [`cltms.py`](https://github.com/pisanuw/ltms/blob/main/src/ltms/cltms.py) |
 | 14 Putting the ATMS to Work | [ch14](ch14.md) | concept | — |
 | 15 Antecedent Constraint Languages | [ch15](ch15.md) | concept | — |
 | 16 Assumption-Based Constraint Languages | [ch16](ch16.md) | concept | — |
@@ -103,7 +110,7 @@ is what lets it explain, retract, and search well.
 
 ## Related documents in this repo
 
-- [PLAN.md](../PLAN.md) — the multi-session build plan.
-- [STUDY-NOTES.md](../STUDY-NOTES.md) — a dense technical digest of the TMS internals.
-- [exercises/](../exercises/) — worked solutions to every chapter's exercises.
-- [examples/](../examples/) — runnable demos, including `.kb` world-model files.
+- [PLAN.md](https://github.com/pisanuw/ltms/blob/main/PLAN.md) — the multi-session build plan.
+- [STUDY-NOTES.md](https://github.com/pisanuw/ltms/blob/main/STUDY-NOTES.md) — a dense technical digest of the TMS internals.
+- [exercises/](https://github.com/pisanuw/ltms/tree/main/exercises/) — worked solutions to every chapter's exercises.
+- [examples/](https://github.com/pisanuw/ltms/tree/main/examples/) — runnable demos, including `.kb` world-model files.

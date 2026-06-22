@@ -1,0 +1,13 @@
+# For previewing the site locally with the same stack GitHub Pages uses:
+#
+#   cd docs
+#   bundle install
+#   bundle exec jekyll serve   # then open http://127.0.0.1:4000/ltms/
+#
+# GitHub Pages itself builds from `docs/` on `main` and ignores this file;
+# it is only for local preview.
+
+source "https://rubygems.org"
+
+gem "github-pages", group: :jekyll_plugins
+gem "jekyll-remote-theme"

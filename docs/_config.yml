@@ -1,0 +1,45 @@
+# GitHub Pages site for the LTMS project.
+# Published from the `docs/` folder on the `main` branch.
+
+title: LTMS
+description: >-
+  A logic-based Truth Maintenance System and pattern-directed reasoning engine
+  in pure Python, after Forbus & de Kleer's "Building Problem Solvers".
+
+# Project site lives at https://pisanuw.github.io/ltms
+url: https://pisanuw.github.io
+baseurl: /ltms
+
+# just-the-docs, pulled in as a remote theme (supported on GitHub Pages).
+remote_theme: just-the-docs/just-the-docs
+
+# Plugins (GitHub Pages also enables jekyll-relative-links by default,
+# which lets the .md links between companion chapters resolve.)
+plugins:
+  - jekyll-remote-theme
+  - jekyll-relative-links
+  - jekyll-seo-tag
+
+# --- just-the-docs options ---
+search_enabled: true
+heading_anchors: true
+color_scheme: light
+
+# "View on GitHub" link in the top-right aux bar.
+aux_links:
+  "GitHub repo":
+    - "https://github.com/pisanuw/ltms"
+aux_links_new_tab: true
+
+# Footer / repo link used by the theme.
+gh_edit_link: true
+gh_edit_repository: "https://github.com/pisanuw/ltms"
+gh_edit_branch: "main"
+gh_edit_source: docs
+gh_edit_view_mode: "tree"
+
+# Don't process the project's non-site files if any leak in.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor

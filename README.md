@@ -10,7 +10,10 @@ every derived value, performs **dependency-directed backtracking** on
 contradictions, and can **explain** why anything is believed. A small
 forward-chaining rule engine sits on top of it.
 
-> **New to this?** Start with the [study companion](companion/) — a
+> **Documentation site:** <https://pisanuw.github.io/ltms/> (built from
+> [`docs/`](docs/)).
+>
+> **New to this?** Start with the [study companion](docs/companion/) — a
 > chapter-by-chapter walk-through of the concepts, examples, and exercise
 > solutions. See also [PLAN.md](PLAN.md) for the build plan and
 > [STUDY-NOTES.md](STUDY-NOTES.md) for the technical digest.
