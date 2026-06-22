@@ -69,3 +69,5 @@ Format: `YYYY-MM-DD [type] description` (max 200 chars). Types: decision, plan, 
 2026-06-21 [code] Committed above as 8ea0dfe (local, not pushed). Deleted untracked CODE-IMPROVE-REPORT.md.
 
 2026-06-21 [code] Published ltms 0.1.0 to PyPI (pypi.org/project/ltms/0.1.0): wheel+sdist via twine, twine check passed, verified pip-installable from a clean venv. TestPyPI dry-run skipped (separate-account auth). Pending: push main + tag v0.1.0.
+
+2026-06-21 [code] Finalized 0.1.0 release: added PyPI/Python/license badges to README, committed (eaafb56), pushed main to GitHub, tagged + pushed v0.1.0. Repo now matches PyPI. (0.1.0 is immutable on PyPI; next fix needs 0.1.1.)
