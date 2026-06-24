@@ -71,3 +71,5 @@ Format: `YYYY-MM-DD [type] description` (max 200 chars). Types: decision, plan, 
 2026-06-21 [code] Published ltms 0.1.0 to PyPI (pypi.org/project/ltms/0.1.0): wheel+sdist via twine, twine check passed, verified pip-installable from a clean venv. TestPyPI dry-run skipped (separate-account auth). Pending: push main + tag v0.1.0.
 
 2026-06-21 [code] Finalized 0.1.0 release: added PyPI/Python/license badges to README, committed (eaafb56), pushed main to GitHub, tagged + pushed v0.1.0. Repo now matches PyPI. (0.1.0 is immutable on PyPI; next fix needs 0.1.1.)
+
+2026-06-24 [code] audit-ci-gates: CI installed only .[dev], so pysat absent -> importorskip silently skipped ALL of test_watched.py (7 watched-engine tests) + the BCP-vs-Minisat22 differential test on every run (confirmed: "0 collected / 2 skipped"). Fixed CI to install .[dev,sat] (python-sat ships cp310-cp313 linux wheels = full matrix), added pip cache + cache-dependency-path, pytest -ra to surface skips, and a CI status badge to README. Verified: deliberate break in a watched test -> red with sat / silently skipped without. 161 tests, YAML valid. Not yet committed/pushed.

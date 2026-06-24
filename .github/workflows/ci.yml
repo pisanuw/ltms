@@ -16,16 +16,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          # [sat] pulls in python-sat so the differential-SAT and watched-literals
+          # tests actually run in CI; without it they importorskip and silently pass.
+          pip install -e ".[dev,sat]"
       - name: Lint (ruff)
         run: ruff check .
       - name: Typecheck (mypy)
         run: mypy
       - name: Test (pytest)
-        run: pytest
+        # -ra surfaces any skips so a silently-skipped suite is visible in the log.
+        run: pytest -ra
 
   build:
     runs-on: ubuntu-latest
@@ -34,6 +39,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
       - name: Build wheel + sdist
         run: |
           python -m pip install --upgrade pip build

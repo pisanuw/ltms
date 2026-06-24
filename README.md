@@ -1,5 +1,6 @@
 # ltms
 
+[![CI](https://github.com/pisanuw/ltms/actions/workflows/ci.yml/badge.svg)](https://github.com/pisanuw/ltms/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/ltms.svg)](https://pypi.org/project/ltms/)
 [![Python versions](https://img.shields.io/pypi/pyversions/ltms.svg)](https://pypi.org/project/ltms/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
