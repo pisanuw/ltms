@@ -22,7 +22,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from ..terms import Term, Var, is_compound, is_variable, term_to_str
+from ..terms import Term, Var, index_symbol, term_to_str
 from ..unify import FAIL, substitute, unify
 
 # A rule body receives the match bindings and the engine.
@@ -66,21 +66,12 @@ class Tre:
 
     def get_dbclass(self, term: Term, env: dict[Var, Term] | None = None) -> Dbclass:
         """Return (creating if needed) the bucket for ``term``'s leftmost symbol."""
-        if is_compound(term):
-            if not term:
-                raise ValueError("cannot index the empty term ()")
-            return self.get_dbclass(term[0], env)
-        if is_variable(term):
-            if env is not None and term in env:
-                return self.get_dbclass(env[term], env)
-            raise ValueError(f"dbclass: unbound variable {term!r} in head position")
-        if isinstance(term, str):
-            bucket = self.dbclass_table.get(term)
-            if bucket is None:
-                bucket = Dbclass(term, self)
-                self.dbclass_table[term] = bucket
-            return bucket
-        raise ValueError(f"dbclass key must be a symbol, got {term!r}")
+        symbol = index_symbol(term, env)
+        bucket = self.dbclass_table.get(symbol)
+        if bucket is None:
+            bucket = Dbclass(symbol, self)
+            self.dbclass_table[symbol] = bucket
+        return bucket
 
     # -- facts -------------------------------------------------------------- #
 

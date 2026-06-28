@@ -61,3 +61,23 @@ def test_false_formula_is_contradiction():
     add_formula(m, p)  # p true
     with pytest.raises(LTMSContradiction):
         add_formula(m, ("not", p))  # ~p -> violated
+
+
+def test_malformed_connective_raises_valueerror():
+    # implies/iff/not with the wrong arity must raise a clear ValueError, not an
+    # IndexError from blindly indexing exp[1]/exp[2].
+    m = LTMS()
+    p, q = _nodes(m, "p", "q")
+    with pytest.raises(ValueError, match="implies needs"):
+        normalize(("implies", p))
+    with pytest.raises(ValueError, match="iff needs"):
+        normalize(("iff", p, q, p))
+    with pytest.raises(ValueError, match="not needs"):
+        normalize(("not", p, q))
+
+
+def test_empty_taxonomy_raises_valueerror():
+    # "exactly one of nothing" is unsatisfiable; an empty taxonomy must be
+    # rejected loudly, not silently make the whole theory unsatisfiable.
+    with pytest.raises(ValueError, match="taxonomy needs at least one"):
+        normalize(("taxonomy",))

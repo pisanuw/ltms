@@ -9,7 +9,9 @@ propositions are compounds, ``?x`` is a variable, numbers are numbers::
     sprinkler on -> wet ground   # an implication
 
 Connectives (low to high precedence): ``<->`` ``->`` ``|`` ``&`` ``~``.
-Parentheses group. ``->`` is right-associative.
+Parentheses group. ``->`` is right-associative. Because those characters start
+operators, a proposition word cannot contain ``< - = | & ~ ( )``; a stray one
+(e.g. ``wet-ground``) is a tokenizer error, so spell such names without them.
 
 Statements (the leading keyword is the directive; a bare line is an assertion)::
 
@@ -256,7 +258,10 @@ def load_kb(text: str, engine: LTRE | None = None) -> KBResult:
             expr = parse_expr(rest)
             result.queries.append((rest, _status(engine, expr)))  # rest already stripped
         elif head == "expect":
-            *expr_words, expected = rest.split()
+            parts = rest.split()
+            if len(parts) < 2:
+                raise ValueError(f"expect needs '<expression> <status>': {line!r}")
+            *expr_words, expected = parts
             expr_text = " ".join(expr_words)
             expr = parse_expr(expr_text)
             actual = _status(engine, expr)

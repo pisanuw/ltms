@@ -17,14 +17,10 @@ on every assertion.
 
 from __future__ import annotations
 
-from .core import LTMS, Label, TmsNode
+from .core import LTMS, Label, TmsNode, opposite_sign
 
 # A clause-as-set: frozenset of (node, sign) literals.
 LitSet = "frozenset[tuple[TmsNode, Label]]"
-
-
-def _opposite(sign: Label) -> Label:
-    return Label.FALSE if sign is Label.TRUE else Label.TRUE
 
 
 def consensus(
@@ -36,7 +32,7 @@ def consensus(
     the resolvent is their union minus that pair. More than one complementary
     pair would yield a tautology, so None is returned.
     """
-    complementary = {n for (n, s) in c1 if (n, _opposite(s)) in c2}
+    complementary = {n for (n, s) in c1 if (n, opposite_sign(s)) in c2}
     if len(complementary) != 1:
         return None
     pivot = next(iter(complementary))

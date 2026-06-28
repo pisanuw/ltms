@@ -68,6 +68,31 @@ def is_atom(x: object) -> bool:
     return not isinstance(x, (Var, tuple))
 
 
+def index_symbol(term: Term, env: dict[Var, Term] | None = None) -> str:
+    """The leftmost ground symbol used to index ``term`` in a fact/rule database.
+
+    Descends into a compound term's head and chases bound variables through
+    ``env`` until it reaches a symbol. Raises :class:`ValueError` on the empty
+    term, an unbound variable in head position, or a non-symbol key. Shared by
+    the TRE / JTRE / LTRE ``get_dbclass`` methods so their indexing stays
+    identical.
+    """
+    while True:
+        if is_compound(term):
+            if not term:
+                raise ValueError("cannot index the empty term ()")
+            term = term[0]
+        elif is_variable(term):
+            if env is not None and term in env:
+                term = env[term]
+            else:
+                raise ValueError(f"dbclass: unbound variable {term!r} in head position")
+        elif isinstance(term, str):
+            return term
+        else:
+            raise ValueError(f"dbclass key must be a symbol, got {term!r}")
+
+
 def term_to_str(term: Term) -> str:
     """Render a term back into s-expression notation."""
     if isinstance(term, Var):

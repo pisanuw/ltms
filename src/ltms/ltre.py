@@ -27,7 +27,7 @@ from typing import Any
 
 from .core import LTMS, Label, TmsNode
 from .normalize import CONNECTIVES, add_formula
-from .terms import Term, Var, is_compound, is_variable
+from .terms import Term, Var, index_symbol
 from .unify import FAIL, substitute, unify
 
 RuleBody = Callable[["dict[Var, Term]", "LTRE"], None]
@@ -102,21 +102,12 @@ class LTRE:
     # -- indexing / interning ---------------------------------------------- #
 
     def get_dbclass(self, term: Term, env: dict[Var, Term] | None = None) -> Dbclass:
-        if is_compound(term):
-            if not term:
-                raise ValueError("cannot index the empty term ()")
-            return self.get_dbclass(term[0], env)
-        if is_variable(term):
-            if env is not None and term in env:
-                return self.get_dbclass(env[term], env)
-            raise ValueError(f"dbclass: unbound variable {term!r} in head position")
-        if isinstance(term, str):
-            bucket = self.dbclass_table.get(term)
-            if bucket is None:
-                bucket = Dbclass(term, self)
-                self.dbclass_table[term] = bucket
-            return bucket
-        raise ValueError(f"dbclass key must be a symbol, got {term!r}")
+        symbol = index_symbol(term, env)
+        bucket = self.dbclass_table.get(symbol)
+        if bucket is None:
+            bucket = Dbclass(symbol, self)
+            self.dbclass_table[symbol] = bucket
+        return bucket
 
     def referent(self, form: Term, *, create: bool = False) -> Datum | None:
         """Intern (or look up) the datum for an unsigned simple proposition."""

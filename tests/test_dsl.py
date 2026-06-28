@@ -50,6 +50,13 @@ def test_atom_still_parses_real_numbers():
     assert parse_expr("age fred 42") == ("age", "fred", 42)
 
 
+def test_expect_without_status_raises():
+    # `expect <expression> <status>` needs both; a single token must give a
+    # clear error, not a confusing parse failure on an empty expression.
+    with pytest.raises(ValueError, match="expect needs"):
+        load_kb("expect rain")
+
+
 def test_kb_assert_and_query():
     kb = """
     # background theory

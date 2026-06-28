@@ -37,6 +37,8 @@ def _normalize_1(exp: Any, negate: bool) -> list[list[tuple[TmsNode, Label]]]:
         raise ValueError(f"not a formula (leaves must be TmsNode): {exp!r}")
     head = exp[0]
     if head == "not":
+        if len(exp) != 2:
+            raise ValueError(f"not needs exactly 1 operand: {exp!r}")
         return _normalize_1(exp[1], not negate)
     if head in ("and", "or"):
         # De Morgan: an unnegated AND is a conjunction of clauses and an
@@ -45,9 +47,13 @@ def _normalize_1(exp: Any, negate: bool) -> list[list[tuple[TmsNode, Label]]]:
         build = _normalize_conjunction if as_conjunction else _normalize_disjunction
         return build(exp[1:], negate)
     if head == "implies":
+        if len(exp) != 3:
+            raise ValueError(f"implies needs exactly 2 operands: {exp!r}")
         a, b = exp[1], exp[2]
         return _normalize_1(("or", ("not", a), b), negate)
     if head == "iff":
+        if len(exp) != 3:
+            raise ValueError(f"iff needs exactly 2 operands: {exp!r}")
         a, b = exp[1], exp[2]
         return _normalize_1(("and", ("implies", a, b), ("implies", b, a)), negate)
     if head == "taxonomy":
@@ -85,6 +91,11 @@ def _disjoin(
 
 def _expand_taxonomy(items: tuple[Any, ...]) -> tuple[Any, ...]:
     """``(taxonomy a b c)`` = exactly one holds: (or a b c) and pairwise not-both."""
+    if not items:
+        # "exactly one of nothing" is unsatisfiable; an empty taxonomy is almost
+        # certainly a mistake, so reject it loudly instead of silently emitting
+        # an empty (always-false) OR that makes the whole theory unsatisfiable.
+        raise ValueError("taxonomy needs at least one option")
     at_least_one: tuple[Any, ...] = ("or", *items)
     pairwise = [
         ("not", ("and", items[i], items[j]))

@@ -33,13 +33,10 @@ from .core import (
     TmsNode,
     assumptions_underlying_clause,
     assumptions_underlying_node,
+    opposite_sign,
 )
 
 ContradictionHandler = Callable[["list[Clause]", "WatchedLTMS"], bool]
-
-
-def _opposite(sign: Label) -> Label:
-    return Label.FALSE if sign is Label.TRUE else Label.TRUE
 
 
 class WatchedLTMS:
@@ -173,7 +170,7 @@ class WatchedLTMS:
     def _assign(self, node: TmsNode, value: Label, reason: Support) -> None:
         node.label = value
         node.support = reason
-        self._pending.append((node, _opposite(value)))  # this literal is now false
+        self._pending.append((node, opposite_sign(value)))  # this literal is now false
 
     # public labelling primitive (parity with LTMS.set_truth)
     def set_truth(self, node: TmsNode, value: Label, reason: Support) -> None:
@@ -278,7 +275,10 @@ class WatchedLTMS:
         for n in freed:  # re-derive from alternative support
             for s in (Label.TRUE, Label.FALSE):
                 touched.update(self._membership.get((n, s), []))
-        for clause in touched:
+        # Re-install in a deterministic (clause-index) order. The final labels
+        # are order-independent, but a fixed order keeps runs reproducible and
+        # avoids set-iteration nondeterminism while clauses are being re-derived.
+        for clause in sorted(touched, key=lambda c: c.index):
             self._install(clause)
 
     def _propagate_unknownness(self, start: TmsNode) -> list[TmsNode]:
@@ -293,7 +293,7 @@ class WatchedLTMS:
             node.support = None
             freed.append(node)
             # clauses where node was a false antecedent: literal (node, ~old)
-            for clause in self._membership.get((node, _opposite(old)), []):
+            for clause in self._membership.get((node, opposite_sign(old)), []):
                 consequent = self._clause_consequent(clause)
                 if (consequent is not None and consequent is not node
                         and consequent.label is not Label.UNKNOWN):
@@ -319,8 +319,8 @@ class WatchedLTMS:
 
     @staticmethod
     def is_true(node: TmsNode) -> bool:
-        return node.label is Label.TRUE
+        return node.is_true
 
     @staticmethod
     def is_false(node: TmsNode) -> bool:
-        return node.label is Label.FALSE
+        return node.is_false

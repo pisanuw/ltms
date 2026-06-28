@@ -48,6 +48,15 @@ def negate(label: Label) -> Label:
     return Label.UNKNOWN
 
 
+def opposite_sign(sign: Label) -> Label:
+    """Flip a definite two-valued literal sign (TRUE<->FALSE).
+
+    Unlike :func:`negate`, this assumes a definite sign and never returns
+    UNKNOWN; use it for clause-literal signs (which are always TRUE or FALSE).
+    """
+    return Label.FALSE if sign is Label.TRUE else Label.TRUE
+
+
 class _EnabledAssumption:
     """Sentinel: node believed because it is an enabled assumption."""
 
