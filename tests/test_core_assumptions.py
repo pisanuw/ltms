@@ -63,6 +63,19 @@ def test_avoid_all_resolves_contradiction_with_nogood():
     assert len(m.clauses) > n_clauses_before  # a nogood clause was added
 
 
+def test_add_nogood_with_no_definite_assumptions_is_noop():
+    # When no assumption has a definite value (here the culprit's sign is
+    # UNKNOWN), the nogood reduces to an empty clause -- permanently violated,
+    # which would silently make the LTMS unsatisfiable. add_nogood must refuse
+    # it and install nothing.
+    m = LTMS()
+    a = m.create_node("a", assumption=True)  # never enabled -> label UNKNOWN
+    n_clauses_before = len(m.clauses)
+    result = m.add_nogood(a, Label.UNKNOWN, [a])
+    assert result is None
+    assert len(m.clauses) == n_clauses_before  # nothing was installed
+
+
 def test_unsatisfiable_without_assumptions_raises():
     m = LTMS()
     p = m.create_node("p")

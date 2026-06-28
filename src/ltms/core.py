@@ -158,6 +158,40 @@ _TAUTOLOGY = object()
 ContradictionHandler = Callable[["list[Clause]", "LTMS"], bool]
 
 
+def assumptions_underlying_node(node: TmsNode) -> list[TmsNode]:
+    """Enabled assumptions underlying ``node``'s well-founded support.
+
+    Shared by the counter (:class:`LTMS`) and watched-literals
+    (:class:`~ltms.watched.WatchedLTMS`) engines so the two stay in lockstep.
+    """
+    result: list[TmsNode] = []
+    visited: set[int] = set()
+    work: list[TmsNode] = [node]
+    while work:
+        n = work.pop()
+        if id(n) in visited:
+            continue
+        visited.add(id(n))
+        if n.support is ENABLED_ASSUMPTION:
+            result.append(n)
+        elif isinstance(n.support, Clause):
+            # the clause's other literals are antecedents of this node
+            work.extend(m for m, _sign in n.support.literals if m is not n)
+    return result
+
+
+def assumptions_underlying_clause(clause: Clause) -> list[TmsNode]:
+    """Enabled assumptions underlying every literal of ``clause`` (deduped)."""
+    result: list[TmsNode] = []
+    seen: set[int] = set()
+    for n, _sign in clause.literals:
+        for a in assumptions_underlying_node(n):
+            if id(a) not in seen:
+                seen.add(id(a))
+                result.append(a)
+    return result
+
+
 class LTMS:
     """A logic-based truth maintenance system instance (BCP engine)."""
 
@@ -441,32 +475,11 @@ class LTMS:
 
     def assumptions_of_node(self, node: TmsNode) -> list[TmsNode]:
         """Enabled assumptions underlying ``node``'s well-founded support."""
-        result: list[TmsNode] = []
-        visited: set[int] = set()
-        work: list[TmsNode] = [node]
-        while work:
-            n = work.pop()
-            if id(n) in visited:
-                continue
-            visited.add(id(n))
-            if n.support is ENABLED_ASSUMPTION:
-                result.append(n)
-            elif isinstance(n.support, Clause):
-                for m, _sign in n.support.literals:
-                    if m is not n:  # the clause's other literals are antecedents
-                        work.append(m)
-        return result
+        return assumptions_underlying_node(node)
 
     def assumptions_of_clause(self, clause: Clause) -> list[TmsNode]:
         """Enabled assumptions underlying every literal of ``clause``."""
-        result: list[TmsNode] = []
-        seen: set[int] = set()
-        for n, _sign in clause.literals:
-            for a in self.assumptions_of_node(n):
-                if id(a) not in seen:
-                    seen.add(id(a))
-                    result.append(a)
-        return result
+        return assumptions_underlying_clause(clause)
 
     def add_nogood(
         self,
@@ -487,6 +500,11 @@ class LTMS:
                 trues.append(a)  # negate a false assumption -> a
         literals = [(n, Label.TRUE) for n in trues]
         literals += [(n, Label.FALSE) for n in falses]
+        if not literals:
+            # No definite assumptions to forbid (e.g. they all went UNKNOWN):
+            # an empty clause is permanently violated and would silently make
+            # the LTMS unsatisfiable. There is nothing to rule out -> no-op.
+            return None
         return self.add_clause_literals(literals, "NOGOOD", internal=internal)
 
     # -- queries ------------------------------------------------------------ #

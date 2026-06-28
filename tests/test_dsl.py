@@ -35,6 +35,21 @@ def test_tokenize_stray_op_char_raises(bad):
         tokenize(bad)
 
 
+@pytest.mark.parametrize("word", ["nan", "inf", "Infinity"])
+def test_atom_keeps_special_floats_as_symbols(word):
+    # float() also parses "nan"/"inf"/"infinity"; those are proposition names,
+    # not numbers, and float('nan') would break node identity (nan != nan).
+    # Regression: they must stay string symbols, not become floats.
+    assert parse_expr(word) == (word,)
+
+
+def test_atom_still_parses_real_numbers():
+    # The special-float guard must not stop genuine numeric atoms parsing.
+    assert parse_expr("42") == (42,)
+    assert parse_expr("3.5") == (3.5,)
+    assert parse_expr("age fred 42") == ("age", "fred", 42)
+
+
 def test_kb_assert_and_query():
     kb = """
     # background theory

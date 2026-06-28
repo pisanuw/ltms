@@ -38,20 +38,12 @@ def _normalize_1(exp: Any, negate: bool) -> list[list[tuple[TmsNode, Label]]]:
     head = exp[0]
     if head == "not":
         return _normalize_1(exp[1], not negate)
-    if head == "and":
-        subs = exp[1:]
-        return (
-            _normalize_disjunction(subs, negate)
-            if negate
-            else _normalize_conjunction(subs, negate)
-        )
-    if head == "or":
-        subs = exp[1:]
-        return (
-            _normalize_conjunction(subs, negate)
-            if negate
-            else _normalize_disjunction(subs, negate)
-        )
+    if head in ("and", "or"):
+        # De Morgan: an unnegated AND is a conjunction of clauses and an
+        # unnegated OR a disjunction; negation swaps the two roles.
+        as_conjunction = (head == "and") != negate
+        build = _normalize_conjunction if as_conjunction else _normalize_disjunction
+        return build(exp[1:], negate)
     if head == "implies":
         a, b = exp[1], exp[2]
         return _normalize_1(("or", ("not", a), b), negate)

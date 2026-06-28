@@ -24,7 +24,16 @@ from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from typing import Any
 
-from .core import ENABLED_ASSUMPTION, Clause, Label, LTMSContradiction, Support, TmsNode
+from .core import (
+    ENABLED_ASSUMPTION,
+    Clause,
+    Label,
+    LTMSContradiction,
+    Support,
+    TmsNode,
+    assumptions_underlying_clause,
+    assumptions_underlying_node,
+)
 
 ContradictionHandler = Callable[["list[Clause]", "WatchedLTMS"], bool]
 
@@ -301,29 +310,10 @@ class WatchedLTMS:
     # -- explanation / nogoods --------------------------------------------- #
 
     def assumptions_of_node(self, node: TmsNode) -> list[TmsNode]:
-        result: list[TmsNode] = []
-        visited: set[int] = set()
-        work = [node]
-        while work:
-            n = work.pop()
-            if id(n) in visited:
-                continue
-            visited.add(id(n))
-            if n.support is ENABLED_ASSUMPTION:
-                result.append(n)
-            elif isinstance(n.support, Clause):
-                work.extend(m for m, _s in n.support.literals if m is not n)
-        return result
+        return assumptions_underlying_node(node)
 
     def assumptions_of_clause(self, clause: Clause) -> list[TmsNode]:
-        result: list[TmsNode] = []
-        seen: set[int] = set()
-        for n, _s in clause.literals:
-            for a in self.assumptions_of_node(n):
-                if id(a) not in seen:
-                    seen.add(id(a))
-                    result.append(a)
-        return result
+        return assumptions_underlying_clause(clause)
 
     # -- queries ------------------------------------------------------------ #
 

@@ -31,6 +31,7 @@ self-checking.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -85,10 +86,13 @@ def _atom(word: str) -> Term:
     except ValueError:
         pass
     try:
-        return float(word)
+        value = float(word)
     except ValueError:
-        pass
-    return word
+        return word
+    # float() also parses "nan"/"inf"/"infinity"; those are almost certainly
+    # proposition names, not numbers, and float('nan') would break node
+    # identity (nan != nan). Keep only finite numeric literals as numbers.
+    return value if math.isfinite(value) else word
 
 
 class _Parser:
@@ -250,7 +254,7 @@ def load_kb(text: str, engine: LTRE | None = None) -> KBResult:
             engine.run_rules()
         elif head == "query":
             expr = parse_expr(rest)
-            result.queries.append((rest.strip(), _status(engine, expr)))
+            result.queries.append((rest, _status(engine, expr)))  # rest already stripped
         elif head == "expect":
             *expr_words, expected = rest.split()
             expr_text = " ".join(expr_words)
@@ -260,7 +264,7 @@ def load_kb(text: str, engine: LTRE | None = None) -> KBResult:
                 raise AssertionError(
                     f"expect failed: {expr_text} is {actual}, wanted {expected}"
                 )
-            result.queries.append((" ".join(expr_words), actual))
+            result.queries.append((expr_text, actual))
         else:  # bare line: an assertion
             engine.assert_(parse_expr(line))
             engine.run_rules()

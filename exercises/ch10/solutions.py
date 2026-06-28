@@ -50,15 +50,13 @@ def needs(engine: LTRE, fact: Term, value: bool = True) -> list[frozenset[Term]]
         if not any(n is goal and s is want for n, s in clause.literals):
             continue
         support: set[Term] = set()
-        ok = True
         for n, s in clause.literals:
             if n is goal:
                 continue
             form = n.datum.lisp_form if hasattr(n.datum, "lisp_form") else n.datum
             # to force the goal, this literal must be false:
             support.add(form if s is Label.FALSE else ("not", form))
-        if ok:
-            out.append(frozenset(support))
+        out.append(frozenset(support))
     return out
 
 

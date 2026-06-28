@@ -31,9 +31,15 @@ def minimal_assumptions_of_node(jtms: JTMS, node: Any) -> list[Any]:
 
     Strategy from the book's hint: start from the assumptions that currently
     underlie the well-founded support, then try retracting each one. If the
-    node stays IN without it (because alternative support exists), it was not
-    needed; otherwise restore it. The leftover set still supports the node and
-    has no removable member.
+    node stays IN without it, it was not needed *within this set*; otherwise
+    restore it.
+
+    Caveat: "stays IN" can be due to support that lies OUTSIDE the starting
+    set (a different enabled assumption entirely). When that happens every
+    member looks removable and this returns the empty set -- a non-redundant
+    subset of the *reported* support, not necessarily one that holds the node
+    up on its own. ``demo_assumptions_of_node_superset`` exhibits exactly that
+    case (c, outside {a, b}, keeps g IN).
     """
     base = list(jtms.assumptions_of_node(node))
     keep = list(base)
@@ -101,7 +107,7 @@ def demo_assumptions_of_node_superset() -> dict[str, Any]:
         "g_in": g.is_in,
         "current_support": current_support,
         "assumptions_of_node_g": sorted(str(x) for x in reported),  # non-minimal
-        "minimal_assumptions_of_node_g": minimal,  # c covers g after retracts
+        "minimal_assumptions_of_node_g": minimal,  # empty: c (outside {a,b}) holds g IN
         "g_still_in_after_minimization": g.is_in,
     }
 

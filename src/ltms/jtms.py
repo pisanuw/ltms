@@ -204,7 +204,15 @@ class JTMS:
         self.check_for_contradictions()
 
     def retract_assumption(self, node: Node) -> None:
-        """Disable an enabled assumption (two-phase relabel)."""
+        """Disable an enabled assumption (two-phase relabel).
+
+        Unlike ``make_contradiction`` / ``justify_node`` / ``enable_assumption``,
+        this does NOT call ``check_for_contradictions``. That is deliberate and
+        matches BPS (jtms.lisp ``retract-assumption``): retraction only removes
+        belief, and ``_find_alternative_support`` re-derives via justifications
+        whose supporting configuration was already contradiction-checked when it
+        was first established. Re-checking here would diverge from the reference.
+        """
         if node.support is ENABLED_ASSUMPTION:
             self._make_node_out(node)
             out = self._propagate_outness(node)
@@ -312,7 +320,7 @@ class JTMS:
             return f"{self.node_string(node)} is IN via enabled assumption."
         assert isinstance(node.support, Justification)
         ants = ", ".join(self.node_string(a) for a in node.support.antecedents)
-        return (
-            f"{self.node_string(node)} is IN via {node.support.informant}"
-            + (f" <= {ants}" if ants else " (premise).")
-        )
+        base = f"{self.node_string(node)} is IN via {node.support.informant}"
+        if ants:
+            return f"{base} <= {ants}"
+        return f"{base} (premise)."

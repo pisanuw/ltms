@@ -46,15 +46,8 @@ def _ex1a_unsafe_test() -> dict[str, Any]:
 
     # --- Order A: the consulted fact arrives BEFORE the trigger. ---
     e1 = JTre()
-    fired_a: list[Any] = []
 
     # Unsafe test: peeks at the live database instead of only at the bindings.
-    e1.add_rule(
-        ("prime-number", N),
-        lambda b, t: fired_a.append(b[N]),
-        # condition IN; the "test" is faked here as a body-side db peek
-    )
-
     def gate_a(b: dict[Var, Any], t: JTre) -> None:
         if t.is_in(("using", "trap-door-code")):  # database peek == unsafe :TEST
             t.justify("suggest", ("suggest-code-key", b[N]), [("prime-number", b[N])])
