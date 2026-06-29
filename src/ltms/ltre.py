@@ -160,9 +160,13 @@ class LTRE:
         node = datum.tms_node
         if datum.assumption is None:
             datum.assumption = informant
-            guarded = ("implies", node, self.build_tms_formula(fact))
-            add_formula(self.ltms, guarded, informant)
-            self.ltms.convert_to_assumption(node)
+            if not node.assumption:
+                # Install the guard clause once. Re-assuming after a retract
+                # re-enables the existing guard instead of leaking a duplicate
+                # (implies N_F formula) clause on every assume/retract cycle.
+                guarded = ("implies", node, self.build_tms_formula(fact))
+                add_formula(self.ltms, guarded, informant)
+                self.ltms.convert_to_assumption(node)
             self.ltms.enable_assumption(node, Label.TRUE)
         return datum
 
@@ -187,35 +191,35 @@ class LTRE:
 
     # -- queries ------------------------------------------------------------ #
 
-    def is_true(self, fact: Term) -> bool:
+    def _signed_node(self, fact: Term) -> tuple[TmsNode | None, bool]:
+        """The node for ``fact``'s unsigned form (or None) and its sign."""
         form, neg = _signed(fact)
         datum = self.referent(form)
-        if datum is None:
-            return False
-        return datum.tms_node.is_false if neg else datum.tms_node.is_true
+        return (datum.tms_node if datum is not None else None, neg)
+
+    def is_true(self, fact: Term) -> bool:
+        node, neg = self._signed_node(fact)
+        return node is not None and (node.is_false if neg else node.is_true)
 
     def is_false(self, fact: Term) -> bool:
-        form, neg = _signed(fact)
-        datum = self.referent(form)
-        if datum is None:
-            return False
-        return datum.tms_node.is_true if neg else datum.tms_node.is_false
+        node, neg = self._signed_node(fact)
+        return node is not None and (node.is_true if neg else node.is_false)
 
     def is_known(self, fact: Term) -> bool:
-        form, _neg = _signed(fact)
-        datum = self.referent(form)
-        return datum is not None and datum.tms_node.is_known
+        node, _neg = self._signed_node(fact)
+        return node is not None and node.is_known
 
     def is_unknown(self, fact: Term) -> bool:
         return not self.is_known(fact)
 
     def fetch(self, pattern: Term) -> list[Term]:
-        form, _neg = _signed(pattern)
+        form, neg = _signed(pattern)
         out: list[Term] = []
         for datum in self.get_dbclass(form).facts:
             result = unify(form, datum.lisp_form)
             if result is not FAIL:
-                out.append(substitute(form, result))  # type: ignore[arg-type]
+                matched = substitute(form, result)  # type: ignore[arg-type]
+                out.append(("not", matched) if neg else matched)
         return out
 
     # -- rules -------------------------------------------------------------- #

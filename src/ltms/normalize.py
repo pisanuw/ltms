@@ -64,10 +64,7 @@ def _normalize_1(exp: Any, negate: bool) -> list[list[tuple[TmsNode, Label]]]:
 def _normalize_conjunction(
     subs: tuple[Any, ...], negate: bool
 ) -> list[list[tuple[TmsNode, Label]]]:
-    clauses: list[list[tuple[TmsNode, Label]]] = []
-    for s in subs:
-        clauses.extend(_normalize_1(s, negate))
-    return clauses
+    return [clause for s in subs for clause in _normalize_1(s, negate)]
 
 
 def _normalize_disjunction(

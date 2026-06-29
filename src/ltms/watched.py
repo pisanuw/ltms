@@ -33,7 +33,9 @@ from .core import (
     TmsNode,
     assumptions_underlying_clause,
     assumptions_underlying_node,
+    clause_consequent,
     opposite_sign,
+    simplify_clause,
 )
 
 ContradictionHandler = Callable[["list[Clause]", "WatchedLTMS"], bool]
@@ -99,7 +101,7 @@ class WatchedLTMS:
         *,
         internal: bool = False,
     ) -> Clause | None:
-        simplified = self._simplify(literals)
+        simplified = simplify_clause(literals)
         if simplified is None:
             return None  # tautology
         self.clause_counter += 1
@@ -112,19 +114,6 @@ class WatchedLTMS:
             self._propagate()
             self.check_for_contradictions()
         return clause
-
-    def _simplify(
-        self, literals: list[tuple[TmsNode, Label]]
-    ) -> list[tuple[TmsNode, Label]] | None:
-        ordered = sorted(literals, key=lambda lit: lit[0].index)
-        result: list[tuple[TmsNode, Label]] = []
-        for n, s in ordered:
-            if result and result[-1][0] is n:
-                if result[-1][1] is s:
-                    continue
-                return None  # n and ~n -> tautology
-            result.append((n, s))
-        return result
 
     # -- watched-literal machinery ----------------------------------------- #
 
@@ -142,6 +131,16 @@ class WatchedLTMS:
                 watchers.remove(clause)
         self._watched[clause] = []
 
+    @staticmethod
+    def _two_watches(k: int, lits: list[tuple[TmsNode, Label]]) -> list[int]:
+        """Watch index ``k``, plus the first other index for a multi-literal clause.
+
+        A clause needs two watches; a length-1 clause watches only ``k``.
+        """
+        if len(lits) == 1:
+            return [k]
+        return [k, next(j for j in range(len(lits)) if j != k)]
+
     def _install(self, clause: Clause) -> None:
         """Choose watches and force/record if the clause is unit/violated."""
         self._clear_watches(clause)
@@ -151,16 +150,12 @@ class WatchedLTMS:
             return
         nonfalse = self._nonfalse_indices(clause)
         if not nonfalse:
-            self._set_watches(clause, [0] if len(lits) == 1 else [0, 1])
+            self._set_watches(clause, self._two_watches(0, lits))
             self._record_violation(clause)
             return
         if len(nonfalse) == 1:
             k = nonfalse[0]
-            if len(lits) == 1:
-                self._set_watches(clause, [k])
-            else:
-                other = next(j for j in range(len(lits)) if j != k)
-                self._set_watches(clause, [k, other])
+            self._set_watches(clause, self._two_watches(k, lits))
             n, s = lits[k]
             if n.label is Label.UNKNOWN:  # unit: force the lone non-false literal
                 self._assign(n, s, clause)
@@ -294,18 +289,11 @@ class WatchedLTMS:
             freed.append(node)
             # clauses where node was a false antecedent: literal (node, ~old)
             for clause in self._membership.get((node, opposite_sign(old)), []):
-                consequent = self._clause_consequent(clause)
+                consequent = clause_consequent(clause)
                 if (consequent is not None and consequent is not node
                         and consequent.label is not Label.UNKNOWN):
                     queue.append(consequent)
         return freed
-
-    @staticmethod
-    def _clause_consequent(clause: Clause) -> TmsNode | None:
-        for node, _s in clause.literals:
-            if node.support is clause:
-                return node
-        return None
 
     # -- explanation / nogoods --------------------------------------------- #
 

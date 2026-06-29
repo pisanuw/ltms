@@ -17,6 +17,7 @@ nested tuples; ``?``-prefixed tokens become :class:`Var`.
 
 from __future__ import annotations
 
+import math
 from typing import TypeGuard, Union
 
 Atom = str | int | float
@@ -127,6 +128,10 @@ def _tokenize(text: str) -> list[str]:
 
 
 def _atom(token: str) -> Term:
+    """Parse a single token into an atom (``Var``, ``int``, ``float``, or symbol).
+
+    Shared with the ``.kb`` parser (:mod:`ltms.dsl`) so the two readers agree.
+    """
     if token.startswith("?"):
         return Var(token[1:])
     try:
@@ -134,10 +139,13 @@ def _atom(token: str) -> Term:
     except ValueError:
         pass
     try:
-        return float(token)
+        value = float(token)
     except ValueError:
-        pass
-    return token
+        return token
+    # float() also parses "nan"/"inf"/"infinity"; those are almost certainly
+    # symbols, not numbers, and float('nan') would break term identity
+    # (nan != nan). Keep only finite numeric literals as numbers.
+    return value if math.isfinite(value) else token
 
 
 def _parse(tokens: list[str], pos: int) -> tuple[Term, int]:

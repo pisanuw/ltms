@@ -33,12 +33,11 @@ self-checking.
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from .ltre import LTRE, RuleBody, Trigger
-from .terms import Term, Var
+from .terms import Term, Var, _atom
 from .unify import substitute
 
 _MULTI_OPS = ("<->", "->", "=>")
@@ -54,14 +53,10 @@ def tokenize(text: str) -> list[str]:
         if c.isspace():
             i += 1
             continue
-        matched = False
-        for op in _MULTI_OPS:
-            if text.startswith(op, i):
-                tokens.append(op)
-                i += len(op)
-                matched = True
-                break
-        if matched:
+        op = next((o for o in _MULTI_OPS if text.startswith(o, i)), None)
+        if op is not None:
+            tokens.append(op)
+            i += len(op)
             continue
         if c in _SINGLE_OPS:
             tokens.append(c)
@@ -78,23 +73,6 @@ def tokenize(text: str) -> list[str]:
         tokens.append(text[i:j])
         i = j
     return tokens
-
-
-def _atom(word: str) -> Term:
-    if word.startswith("?"):
-        return Var(word[1:])
-    try:
-        return int(word)
-    except ValueError:
-        pass
-    try:
-        value = float(word)
-    except ValueError:
-        return word
-    # float() also parses "nan"/"inf"/"infinity"; those are almost certainly
-    # proposition names, not numbers, and float('nan') would break node
-    # identity (nan != nan). Keep only finite numeric literals as numbers.
-    return value if math.isfinite(value) else word
 
 
 class _Parser:

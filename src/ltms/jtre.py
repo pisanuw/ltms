@@ -122,6 +122,10 @@ class JTre:
             datum.assumption = informant
             self.jtms.convert_to_assumption(datum.tms_node)
             self.jtms.enable_assumption(datum.tms_node)
+        elif datum.assumption != informant:
+            # Match LTRE.assume: a different informant cannot "own" an already
+            # assumed fact (it could then neither retract it nor be sure it holds).
+            raise ValueError(f"{fact} already assumed by {datum.assumption!r}")
         return datum
 
     def retract(self, fact: Term, informant: Any = "user") -> None:

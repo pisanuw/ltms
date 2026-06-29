@@ -160,9 +160,6 @@ class Clause:
         return f"<clause {self.index}: ({' v '.join(parts)})>"
 
 
-# Sentinel for a tautological (always-true) clause, dropped on install.
-_TAUTOLOGY = object()
-
 # A contradiction handler returns True iff it resolved the contradiction.
 ContradictionHandler = Callable[["list[Clause]", "LTMS"], bool]
 
@@ -199,6 +196,38 @@ def assumptions_underlying_clause(clause: Clause) -> list[TmsNode]:
                 seen.add(id(a))
                 result.append(a)
     return result
+
+
+def simplify_clause(
+    literals: list[tuple[TmsNode, Label]],
+) -> list[tuple[TmsNode, Label]] | None:
+    """Sort by node index, drop duplicate literals, and detect tautologies.
+
+    Returns the simplified literal list, or ``None`` if the clause is a tautology
+    (it contains a node alongside its negation). Shared by the counter
+    (:class:`LTMS`) and watched-literals (:class:`~ltms.watched.WatchedLTMS`)
+    engines so their clause preprocessing stays in lockstep.
+    """
+    ordered = sorted(literals, key=lambda lit: lit[0].index)
+    result: list[tuple[TmsNode, Label]] = []
+    for node, sign in ordered:
+        if result and result[-1][0] is node:
+            if result[-1][1] is sign:
+                continue  # duplicate literal
+            return None  # node and its negation -> tautology
+        result.append((node, sign))
+    return result
+
+
+def clause_consequent(clause: Clause) -> TmsNode | None:
+    """The node (if any) whose well-founded support is ``clause`` itself.
+
+    Shared by both engines' retraction phase to find the node a clause forced.
+    """
+    for node, _sign in clause.literals:
+        if node.support is clause:
+            return node
+    return None
 
 
 class LTMS:
@@ -254,28 +283,14 @@ class LTMS:
         *,
         internal: bool = False,
     ) -> Clause | None:
-        simplified = self._simplify_clause(literals)
-        if simplified is _TAUTOLOGY:
-            return None
-        assert isinstance(simplified, list)
+        simplified = simplify_clause(literals)
+        if simplified is None:
+            return None  # tautology
         clause = self._bcp_add_clause(simplified, informant)
         if not internal:
             self._run_bcp()
             self.check_for_contradictions()
         return clause
-
-    def _simplify_clause(
-        self, literals: list[tuple[TmsNode, Label]]
-    ) -> list[tuple[TmsNode, Label]] | object:
-        ordered = sorted(literals, key=lambda lit: lit[0].index)
-        result: list[tuple[TmsNode, Label]] = []
-        for node, sign in ordered:
-            if result and result[-1][0] is node:
-                if result[-1][1] is sign:
-                    continue  # duplicate literal
-                return _TAUTOLOGY  # node and its negation
-            result.append((node, sign))
-        return result
 
     def _bcp_add_clause(
         self, literals: list[tuple[TmsNode, Label]], informant: Any
@@ -303,6 +318,19 @@ class LTMS:
 
     # -- propagation -------------------------------------------------------- #
 
+    @staticmethod
+    def _sat_pv_clauses(node: TmsNode, label: Label) -> tuple[list[Clause], list[Clause]]:
+        """The (satisfied, potential-violator) clause lists for ``node`` at ``label``.
+
+        A node labelled TRUE satisfies its ``true_clauses`` and is a potential
+        violator in its ``false_clauses``; FALSE swaps the two. Used by both
+        ``set_truth`` and ``_propagate_unknownness`` so the counter bump and its
+        exact reversal stay mirror images.
+        """
+        if label is Label.TRUE:
+            return node.true_clauses, node.false_clauses
+        return node.false_clauses, node.true_clauses
+
     def set_truth(self, node: TmsNode, value: Label, reason: Support) -> None:
         """Label an UNKNOWN node, update counters, queue affected clauses."""
         node.label = value
@@ -310,11 +338,10 @@ class LTMS:
         if value is Label.TRUE:
             self._fire_rules(node.true_rules)
             node.true_rules = []
-            sat_clauses, pv_clauses = node.true_clauses, node.false_clauses
         else:  # Label.FALSE
             self._fire_rules(node.false_rules)
             node.false_rules = []
-            sat_clauses, pv_clauses = node.false_clauses, node.true_clauses
+        sat_clauses, pv_clauses = self._sat_pv_clauses(node, value)
         for clause in sat_clauses:  # node now satisfies these
             clause.sats += 1
         for clause in pv_clauses:  # node was a potential violator here
@@ -459,26 +486,16 @@ class LTMS:
             node.label = Label.UNKNOWN
             node.support = None
             unknowns.append(node)
-            if old is Label.TRUE:
-                sat_clauses, pv_clauses = node.true_clauses, node.false_clauses
-            else:
-                sat_clauses, pv_clauses = node.false_clauses, node.true_clauses
+            sat_clauses, pv_clauses = self._sat_pv_clauses(node, old)
             for clause in sat_clauses:  # node no longer satisfies these
                 clause.sats -= 1
             for clause in pv_clauses:  # node becomes a potential violator again
                 clause.pvs += 1
                 if clause.pvs == 2:
-                    conseq = self._clause_consequent(clause)
+                    conseq = clause_consequent(clause)
                     if conseq is not None and conseq.label is not Label.UNKNOWN:
                         queue.append(conseq)  # it loses this clause's support
         return unknowns
-
-    @staticmethod
-    def _clause_consequent(clause: Clause) -> TmsNode | None:
-        for node, _sign in clause.literals:
-            if node.support is clause:
-                return node
-        return None
 
     # -- explanation / nogoods --------------------------------------------- #
 
@@ -499,16 +516,13 @@ class LTMS:
         internal: bool = True,
     ) -> Clause | None:
         """Install the clause that forbids this combination of assumptions."""
-        trues: list[TmsNode] = []
-        falses: list[TmsNode] = []
+        literals: list[tuple[TmsNode, Label]] = []
         for a in assumptions:
             value = sign if a is culprit else a.label
             if value is Label.TRUE:
-                falses.append(a)  # negate a true assumption -> ~a
+                literals.append((a, Label.FALSE))  # negate a true assumption -> ~a
             elif value is Label.FALSE:
-                trues.append(a)  # negate a false assumption -> a
-        literals = [(n, Label.TRUE) for n in trues]
-        literals += [(n, Label.FALSE) for n in falses]
+                literals.append((a, Label.TRUE))  # negate a false assumption -> a
         if not literals:
             # No definite assumptions to forbid (e.g. they all went UNKNOWN):
             # an empty clause is permanently violated and would silently make
